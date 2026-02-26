@@ -1,15 +1,14 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T12:50:27.616Z",
-  "summary": "The diff implements both REQ-1 and REQ-2 correctly. Navbar.tsx introduces a showCustomize flag that conditions the Customize tab on authentication, actor readiness, admin status resolution, and isAdmin===true. useQueries.ts fixes the stale-query issue by including the identity principal in the query key and setting staleTime:0. All acceptance criteria appear to be addressed. No hallucinated features were identified.",
+  "generatedAt": "2026-02-26T12:58:27.411Z",
+  "summary": "The diff implements a principal ID banner in the Navbar that displays the authenticated user's principal ID with a copy-to-clipboard button. All acceptance criteria for REQ-1 appear to be satisfied: the banner is conditionally rendered only when authenticated, uses identity.getPrincipal().toString() (valid ICP principal format), and provides a copy button with visual feedback.",
   "missing_requirements": [],
   "hallucinated_features": [],
-  "confidence": 0.92,
+  "confidence": 0.97,
   "changed_files": [
     "frontend-file-summaries.txt",
     "frontend/src/components/Navbar.tsx",
-    "frontend/src/hooks/useQueries.ts",
     "project_state.json"
   ]
 }

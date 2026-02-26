@@ -1,12 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the Customize tab in the Navbar so it appears immediately and reliably for admin users after logging in via Internet Identity, without requiring a page refresh.
+**Goal:** Display the logged-in Internet Identity user's principal ID on screen so it can be easily read and copied.
 
 **Planned changes:**
-- Fix the `Navbar.tsx` to correctly read admin status from the `useIsAdmin` hook/query.
-- Ensure the admin status query is invalidated and refetched automatically after a successful Internet Identity login.
-- Ensure the Customize tab renders reactively as soon as the admin flag resolves to true.
-- Ensure the Customize tab is hidden immediately upon logout or for non-admin/unauthenticated users.
+- When a user is authenticated via Internet Identity, show their principal ID in the Navbar (or as a dismissible banner)
+- Add a copy-to-clipboard button next to the principal ID for easy copying
+- Hide the principal ID display entirely when no user is logged in
 
-**User-visible outcome:** After logging in as an admin, the Customize tab appears in the navigation bar immediately without needing to refresh the page. Logging out hides it right away.
+**User-visible outcome:** After logging in, the user can see their ICP principal ID displayed prominently and copy it with a single click.

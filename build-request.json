@@ -1,60 +1,37 @@
 {
   "kind": "build_request",
-  "title": "Fix Customize tab visibility after admin login",
+  "title": "Display principal ID for logged-in Internet Identity user",
   "projectName": "INDO KIDZ",
-  "priority": "high",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Fix the Customize tab (admin navigation button) in the Navbar so it becomes visible immediately after an admin user logs in with Internet Identity. The tab must reliably appear for admin users and remain hidden for non-admin or unauthenticated users.",
+      "text": "Display the currently logged-in user's Internet Identity principal ID visibly on the page (e.g., in the Navbar or as a dismissible banner) whenever the user is authenticated, so the admin ('Akshit raj') can easily copy and share their principal ID.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-5",
-          "msg-6"
+          "msg-recent"
         ],
         "quotes": [
-          "where is customize tab?",
-          "i am not able to see it still"
+          "display my principal id"
         ]
       },
       "acceptanceCriteria": [
-        "When an admin user logs in via Internet Identity, the Customize tab appears in the navigation bar without requiring a page refresh.",
-        "When a non-admin authenticated user logs in, the Customize tab remains hidden.",
-        "When no user is logged in, the Customize tab is not visible.",
-        "The Customize tab links to the AdminPanel page (/admin or equivalent route).",
-        "Logging out hides the Customize tab immediately."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Ensure the admin status check in Navbar.tsx correctly reads from the useIsAdmin query (or equivalent hook in useQueries.ts) and that the query is invalidated and refetched after login so the Customize tab appears reactively. Debug and fix any stale-query or timing issue that prevents the admin flag from being truthy after authentication.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-5",
-          "msg-6"
-        ],
-        "quotes": [
-          "i am not able to see it still"
-        ]
-      },
-      "acceptanceCriteria": [
-        "After a successful Internet Identity login, the admin status query is refetched automatically.",
-        "The Navbar re-renders with the Customize tab as soon as the admin status resolves to true.",
-        "No manual page refresh is needed for the tab to appear."
+        "When a user is logged in via Internet Identity, their principal ID string is displayed on screen in a readable, copyable format.",
+        "The principal ID display is only shown when the user is authenticated (not shown to logged-out visitors).",
+        "The displayed principal ID matches the format of a valid ICP principal (e.g., xxxxx-xxxxx-xxxxx-xxxxx-xxx).",
+        "The principal ID text can be easily copied (e.g., via a copy-to-clipboard button or selectable text)."
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts or frontend/src/hooks/useActor.ts.",
-    "Do not alter the backend admin authorization logic.",
-    "Preserve all existing navigation links and their routing."
+    "Do not modify any files under frontend/src/hooks/ (immutable paths).",
+    "Use the identity/principal already exposed by the existing useInternetIdentity hook — do not introduce a new auth mechanism."
   ],
   "nonGoals": [
-    "Adding new admin features or tabs.",
-    "Changing the visual design of the navigation bar.",
-    "Modifying the AdminPanel page content or tabs."
+    "Setting or hardcoding the admin principal ID — that will be done in a follow-up once the principal ID is retrieved.",
+    "Persisting or storing the principal ID on the backend.",
+    "Changing any admin access control logic in this request."
   ],
   "imageRequirements": {
     "required": [],

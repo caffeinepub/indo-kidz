@@ -5,7 +5,7 @@ import { useIsAdmin } from "../hooks/useQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import { useActor } from "../hooks/useActor";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Settings, LogIn, LogOut, GraduationCap } from "lucide-react";
+import { Menu, X, Settings, LogIn, LogOut, GraduationCap, Copy, Check } from "lucide-react";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -24,9 +24,12 @@ export default function Navbar() {
   const { isFetching: actorFetching } = useActor();
   const { data: isAdmin, isLoading: isAdminLoading } = useIsAdmin();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const isAuthenticated = !!identity;
   const isLoggingIn = loginStatus === "logging-in";
+
+  const principalId = identity ? identity.getPrincipal().toString() : null;
 
   // Show the Customize button only when:
   // 1. User is authenticated
@@ -52,10 +55,58 @@ export default function Navbar() {
     }
   };
 
+  const handleCopyPrincipal = async () => {
+    if (!principalId) return;
+    try {
+      await navigator.clipboard.writeText(principalId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // fallback for older browsers
+      const el = document.createElement("textarea");
+      el.value = principalId;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   const currentPath = location.pathname;
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-card border-b border-border">
+      {/* Principal ID Banner */}
+      {isAuthenticated && principalId && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-1.5">
+          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 flex-wrap">
+            <span className="text-xs font-semibold text-amber-700">🔑 Your Principal ID:</span>
+            <code className="text-xs font-mono text-amber-900 bg-amber-100 px-2 py-0.5 rounded select-all break-all">
+              {principalId}
+            </code>
+            <button
+              onClick={handleCopyPrincipal}
+              className="flex items-center gap-1 text-xs font-semibold text-amber-700 hover:text-amber-900 bg-amber-100 hover:bg-amber-200 px-2 py-0.5 rounded transition-colors"
+              title="Copy principal ID"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-3 h-3 text-green-600" />
+                  <span className="text-green-700">Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3 h-3" />
+                  <span>Copy</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}

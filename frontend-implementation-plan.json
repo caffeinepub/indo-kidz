@@ -1,44 +1,22 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix Customize tab visibility after admin login",
+  "title": "Display principal ID for logged-in Internet Identity user",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Fix the Customize tab in Navbar to appear immediately after admin login via Internet Identity without requiring page refresh",
+      "summary": "Display the currently logged-in user's Internet Identity principal ID visibly on the page (e.g., in the Navbar or as a dismissible banner) whenever the user is authenticated, so the admin can easily copy and share their principal ID.",
       "acceptanceCriteria": [
-        "When an admin user logs in via Internet Identity, the Customize tab appears in the navigation bar without requiring a page refresh.",
-        "When a non-admin authenticated user logs in, the Customize tab remains hidden.",
-        "When no user is logged in, the Customize tab is not visible.",
-        "The Customize tab links to the AdminPanel page (/admin or equivalent route).",
-        "Logging out hides the Customize tab immediately."
+        "When a user is logged in via Internet Identity, their principal ID string is displayed on screen in a readable, copyable format.",
+        "The principal ID display is only shown when the user is authenticated (not shown to logged-out visitors).",
+        "The displayed principal ID matches the format of a valid ICP principal (e.g., xxxxx-xxxxx-xxxxx-xxxxx-xxx).",
+        "The principal ID text can be easily copied (e.g., via a copy-to-clipboard button or selectable text)."
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/Navbar.tsx",
           "operation": "modify",
-          "description": "Review and fix the admin status check logic to ensure the Customize tab becomes visible immediately after login. Verify that the useIsAdmin hook is called correctly and that the component re-renders when the admin status query resolves. Ensure the tab visibility logic correctly evaluates both authentication and admin status, and that logout properly hides the tab."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Ensure admin status query is refetched after login and Navbar re-renders reactively when admin status becomes true",
-      "acceptanceCriteria": [
-        "After a successful Internet Identity login, the admin status query is refetched automatically.",
-        "The Navbar re-renders with the Customize tab as soon as the admin status resolves to true.",
-        "No manual page refresh is needed for the tab to appear."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Review the useIsAdmin query hook implementation to ensure it properly depends on the actor availability and refetches when authentication state changes. Verify the query is enabled only when the actor is ready and that it correctly invalidates on login/logout events. Fix any stale query or timing issues that prevent the admin flag from becoming truthy after authentication."
-        },
-        {
-          "path": "frontend/src/components/Navbar.tsx",
-          "operation": "modify",
-          "description": "Ensure the Navbar component correctly subscribes to both authentication state and admin query results. Add query invalidation trigger after successful login if needed to force immediate refetch of admin status. Verify the component properly handles loading states and re-renders when either authentication or admin status changes."
+          "description": "Add a principal ID display component to the Navbar that shows the authenticated user's principal ID with a copy-to-clipboard button. The component should only render when the user is authenticated (identity is not null). Use the existing useInternetIdentity hook to access the identity and call identity.getPrincipal().toString() to retrieve the principal ID string. Position the principal ID display visibly in the Navbar (e.g., between navigation links and login button). Include a copy button using a clipboard icon from lucide-react that copies the principal ID to clipboard and shows a toast notification on success."
         }
       ]
     }

@@ -1,33 +1,33 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "INDO KIDZ website project with admin customization panel. Working on fixing the Customize tab visibility issue after login.",
+  "summary": "App with Internet Identity authentication and admin role management. User 'Akshit raj' needs to be set as admin for the Customize tab. Currently adding a principal ID display feature to identify the admin principal.",
   "architectural_notes": [
-    "Customize tab should only be visible to logged-in admin users (Internet Identity authentication)"
+    "Uses Internet Identity for authentication; admin role is determined by hardcoded principal ID",
+    "Customize tab should only be visible to the admin user"
   ],
   "known_issues": [
-    "Customize tab not visible after admin login — needs fix in navigation visibility logic"
+    "Admin principal ID not yet set — Customize tab not visible to intended admin ('Akshit raj')"
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-fix-the-customize-tab-admin-navigation-button-in-the-navbar-so-it-becomes-visible-immediately-after-an-admin-user-logs-in-with-internet-identity-the-tab-must-reliably-appear-for-admin-users-and-remain-hidden-for-non-admin-or-unauthenticated-users",
-      "title": "Fix the Customize tab (admin navigation button) in the Navbar so it becomes visible immediately after an admin user logs in with Internet Identity. The tab must reliably appear for admin users and remain hidden for non-admin or unauthenticated users.",
+      "id": "feature-display-the-currently-logged-in-user-s-internet-identity-principal-id-visibly-on-the-page-e-g-in-the-navbar-or-as-a-dismissible-banner-whenever-the-user-is-authenticated-so-the-admin-akshit-raj-can-easily-copy-and-share-their-principal-id",
+      "title": "Display the currently logged-in user's Internet Identity principal ID visibly on the page (e.g., in the Navbar or as a dismissible banner) whenever the user is authenticated, so the admin ('Akshit raj') can easily copy and share their principal ID.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
-    },
-    {
-      "id": "feature-ensure-the-admin-status-check-in-navbar-tsx-correctly-reads-from-the-useisadmin-query-or-equivalent-hook-in-usequeries-ts-and-that-the-query-is-invalidated-and-refetched-after-login-so-the-customize-tab-appears-reactively-debug-and-fix-any-stale-query-or-timing-issue-that-prevents-the-admin-flag-from-being-truthy-after-authentication",
-      "title": "Ensure the admin status check in Navbar.tsx correctly reads from the useIsAdmin query (or equivalent hook in useQueries.ts) and that the query is invalidated and refetched after login so the Customize tab appears reactively. Debug and fix any stale-query or timing issue that prevents the admin flag from being truthy after authentication.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
     }
   ],
-  "new_feature_requests": [],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Display principal ID for logged-in Internet Identity user so admin can be identified",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
   "gameProjectType": "none",
   "projectName": "INDO KIDZ",
   "clarification_mode": "instant",
