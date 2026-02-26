@@ -1,0 +1,41 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Fix fees customization tab visibility (owner-only access enforcement)",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Ensure the 'Customize Site' button in the Navbar is only rendered for the authenticated owner",
+      "acceptanceCriteria": [
+        "A user who is NOT the registered owner does not see the 'Customize Site' button in the Navbar after login.",
+        "The registered owner still sees and can access the 'Customize Site' button.",
+        "No other UI, routes, or backend logic is changed.",
+        "No runtime errors are introduced."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Navbar.tsx",
+          "operation": "modify",
+          "description": "Audit and correct the conditional rendering logic for the 'Customize Site' button to ensure it only appears when the authenticated user is the registered owner. Review the current isOwner check implementation and fix any logic gaps that allow non-owners to see the button. Verify that the button is hidden for all non-owner users regardless of their authentication state or role."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Ensure the Admin Panel page enforces owner-only access at the route/component level",
+      "acceptanceCriteria": [
+        "Non-owner authenticated users who navigate directly to /admin are shown AccessDeniedScreen.",
+        "The 'Fees' customization tab inside the Admin Panel is not accessible to non-owners.",
+        "Owner retains full access to all admin tabs.",
+        "No other pages, components, or backend logic are affected."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/AdminPanel.tsx",
+          "operation": "modify",
+          "description": "Add owner-only access enforcement at the component level. When the component renders, check if the authenticated user is the owner using the isOwner query. If the user is not the owner, render the AccessDeniedScreen component instead of the admin tabs (Content, Fee Categories, Payment Records). Ensure the isOwner check is complete before rendering any admin functionality to prevent non-owners from seeing or accessing the customization tabs."
+        }
+      ]
+    }
+  ]
+}

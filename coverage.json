@@ -1,0 +1,47 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-26T11:51:45.312Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 2,
+    "implemented": 1,
+    "items": [
+      {
+        "id": "REQ-1",
+        "summary": "Ensure the 'Customize Site' button in the Navbar is only rendered for the authenticated owner. The current logic that conditionally shows the button must be audited and corrected so that no non-owner user ever sees it, regardless of authentication state. Do not change any other UI or logic.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/components/Navbar.tsx"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Ensure the Admin Panel page enforces owner-only access at the route/component level. If a non-owner navigates directly to the admin route, they must see the AccessDeniedScreen and must not be shown the Customize/Fee Category/Payment tabs. Do not change any other functionality.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/AdminPanel.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/AdminPanel.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/AdminPanel.tsx",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

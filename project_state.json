@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "New project",
+  "architectural_notes": [],
+  "known_issues": [
+    "Fees customization tab is visible to the user when it should not be (customization failure)"
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-ensure-the-admin-panel-page-enforces-owner-only-access-at-the-route-component-level-if-a-non-owner-navigates-directly-to-the-admin-route-they-must-see-the-accessdeniedscreen-and-must-not-be-shown-the-customize-fee-category-payment-tabs-do-not-change-any-other-functionality",
+      "title": "Ensure the Admin Panel page enforces owner-only access at the route/component level. If a non-owner navigates directly to the admin route, they must see the AccessDeniedScreen and must not be shown the Customize/Fee Category/Payment tabs. Do not change any other functionality.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Ensure the 'Customize Site' button in the Navbar is only rendered for the authenticated owner. The current logic that conditionally shows the button must be audited and corrected so that no non-owner user ever sees it, regardless of authentication state. Do not change any other UI or logic.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Fix fees customization tab visibility (owner-only access enforcement)",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}
