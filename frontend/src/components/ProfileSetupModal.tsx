@@ -1,69 +1,78 @@
-import { useState } from 'react';
+import { useState } from "react";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import { useGetCallerUserProfile, useSaveCallerUserProfile } from "../hooks/useQueries";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useSaveCallerUserProfile } from '../hooks/useQueries';
-import { toast } from 'sonner';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { GraduationCap } from "lucide-react";
+import { toast } from "sonner";
 
 export default function ProfileSetupModal() {
-  const [name, setName] = useState('');
-  const { mutate: saveProfile, isPending } = useSaveCallerUserProfile();
+  const { identity } = useInternetIdentity();
+  const isAuthenticated = !!identity;
+  const { data: userProfile, isLoading, isFetched } = useGetCallerUserProfile();
+  const saveProfile = useSaveCallerUserProfile();
+  const [name, setName] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const showModal = isAuthenticated && !isLoading && isFetched && userProfile === null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    saveProfile(
-      { name: name.trim() },
-      {
-        onSuccess: () => {
-          toast.success(`Welcome to INDO KIDZ, ${name.trim()}! 🎉`);
-        },
-        onError: () => {
-          toast.error('Failed to save profile. Please try again.');
-        },
-      }
-    );
+    try {
+      await saveProfile.mutateAsync({ name: name.trim(), contactInfo: "" });
+      toast.success("Welcome to INDO KIDZ! 🎉");
+    } catch {
+      toast.error("Failed to save profile. Please try again.");
+    }
   };
 
   return (
-    <Dialog open={true}>
-      <DialogContent className="rounded-3xl border-2 border-primary/30 max-w-md" onInteractOutside={(e) => e.preventDefault()}>
-        <DialogHeader className="text-center">
-          <div className="text-5xl mb-2 text-center">👋</div>
-          <DialogTitle className="font-fredoka text-3xl text-center text-foreground">
-            Welcome to INDO KIDZ!
-          </DialogTitle>
-          <DialogDescription className="text-center text-muted-foreground">
-            Please tell us your name so we can personalize your experience.
-          </DialogDescription>
+    <Dialog open={showModal}>
+      <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
+        <DialogHeader>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-hero flex items-center justify-center">
+              <GraduationCap className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <DialogTitle className="font-fredoka text-2xl text-primary">Welcome!</DialogTitle>
+              <DialogDescription>Set up your profile to continue</DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-          <div className="space-y-2">
-            <Label htmlFor="name" className="font-semibold">
-              Your Name
-            </Label>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="name">Your Name</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your name..."
-              className="rounded-2xl border-2 border-border focus:border-primary"
-              autoFocus
+              placeholder="Enter your full name"
+              className="mt-1"
+              required
             />
           </div>
           <Button
             type="submit"
-            disabled={!name.trim() || isPending}
-            className="w-full rounded-2xl font-bold text-base py-5"
+            className="w-full bg-gradient-hero text-white hover:opacity-90"
+            disabled={saveProfile.isPending || !name.trim()}
           >
-            {isPending ? 'Saving...' : "Let's Go! 🚀"}
+            {saveProfile.isPending ? (
+              <span className="flex items-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Saving...
+              </span>
+            ) : (
+              "Get Started 🚀"
+            )}
           </Button>
         </form>
       </DialogContent>

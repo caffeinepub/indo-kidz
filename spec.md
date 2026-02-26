@@ -1,10 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Fix owner-only access enforcement so the "Customize Site" button and Admin Panel customization tabs are never visible or accessible to non-owner users.
+**Goal:** Fix the Customize tab in the Navbar so it appears immediately and reliably for admin users after logging in via Internet Identity, without requiring a page refresh.
 
 **Planned changes:**
-- Audit and correct the Navbar logic so the "Customize Site" button is only rendered for the authenticated owner, never for any other user.
-- Enforce owner-only access at the Admin Panel route/component level so non-owner users who navigate directly to `/admin` see the `AccessDeniedScreen` and cannot access the Fees, Fee Category, or Payment customization tabs.
+- Fix the `Navbar.tsx` to correctly read admin status from the `useIsAdmin` hook/query.
+- Ensure the admin status query is invalidated and refetched automatically after a successful Internet Identity login.
+- Ensure the Customize tab renders reactively as soon as the admin flag resolves to true.
+- Ensure the Customize tab is hidden immediately upon logout or for non-admin/unauthenticated users.
 
-**User-visible outcome:** Non-owner users no longer see the "Customize Site" button in the Navbar and are shown an access denied screen if they attempt to visit the admin route directly. The owner retains full access to all existing admin functionality.
+**User-visible outcome:** After logging in as an admin, the Customize tab appears in the navigation bar immediately without needing to refresh the page. Logging out hides it right away.

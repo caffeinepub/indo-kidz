@@ -1,280 +1,306 @@
-import { useNavigate } from '@tanstack/react-router';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
-import { useGetHomepageContent, useGetFeeCategories } from '../hooks/useQueries';
-import { Heart, Star, MapPin, Phone, Mail } from 'lucide-react';
+import { useHomeHeroSection, useGetFeeCategories, useAnnouncements } from "../hooks/useQueries";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import {
+  GraduationCap, Users, Award, BookOpen, Star, MapPin, ChevronRight,
+  Megaphone, Sparkles, Heart, Shield, Zap
+} from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 
-const DEFAULT_CONTENT = {
-  heroText: 'Where Learning Meets Joy!',
-  tagline: "Innovative methods, creative approaches, and genuine connections — building tomorrow's leaders today.",
-  aboutUs:
-    'INDO KIDZ is a pioneering school from India that believes every child is a unique learner. We combine innovative teaching methods with a warm, nurturing environment to help each student discover their full potential. Our dedicated teachers build real connections with students, making school a place they love to be.',
-  schoolAddress: 'Beside Nikhil Ashram, Bahtrai, Bilaspur, Chhattisgarh - 495006',
-  contactInfo: 'Email: indokidz@school.in | Phone: +91-XXXXXXXXXX',
-};
+function StatCard({ value, label, icon: Icon }: { value: string; label: string; icon: React.ElementType }) {
+  return (
+    <div className="flex flex-col items-center p-6 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30 hover:bg-white/30 transition-all">
+      <Icon className="w-8 h-8 text-accent mb-2" />
+      <span className="font-fredoka text-4xl text-white">{value}</span>
+      <span className="text-white/80 text-sm font-medium mt-1">{label}</span>
+    </div>
+  );
+}
+
+function HighlightCard({ icon: Icon, title, color }: { icon: React.ElementType; title: string; color: string }) {
+  return (
+    <div className={`p-6 rounded-2xl border-2 ${color} bg-white card-hover`}>
+      <Icon className="w-8 h-8 mb-3 text-primary" />
+      <p className="font-semibold text-foreground leading-snug">{title}</p>
+    </div>
+  );
+}
 
 export default function Homepage() {
   const navigate = useNavigate();
-  const { data: content, isLoading } = useGetHomepageContent();
-  const { data: feeCategories } = useGetFeeCategories();
+  const { data: hero, isLoading: heroLoading } = useHomeHeroSection();
+  const { data: fees } = useGetFeeCategories();
+  const { data: announcements } = useAnnouncements();
 
-  const c = content || DEFAULT_CONTENT;
-  const address = c.schoolAddress || DEFAULT_CONTENT.schoolAddress;
-  const contactInfo = (c as typeof DEFAULT_CONTENT).contactInfo || DEFAULT_CONTENT.contactInfo;
+  const defaultHero = {
+    schoolName: "INDO KIDZ",
+    tagline: "Where Little Minds Bloom into Big Dreams",
+    address: "Beside Nikhil Ashram, 495006, Bilaspur, Chhattisgarh",
+    heroStats: { studentsEnrolled: BigInt(250), yearsOfExcellence: BigInt(9), facultyCount: BigInt(15) },
+    schoolHighlights: {
+      highlight1: "Spacious 3-acre campus in prime city location",
+      highlight2: "Vast playground, digital classrooms, smart library",
+      highlight3: "Highly qualified 1-to-15 teacher ratio",
+    },
+    testimonials: [
+      { name: "Rakesh Sharma", designation: "Parent", feedback: "Excellent caring teachers, top city facilities, holistic child development." },
+      { name: "Pooja Singh", designation: "Parent", feedback: "State-of-the-art technology aids in child growth and creativity." },
+      { name: "Sunita Mishra", designation: "Local Principal", feedback: "Impressive focus on learning, critical thinking and individual development." },
+    ],
+  };
+
+  const h = hero || defaultHero;
+
+  const highlightIcons = [Sparkles, Heart, Shield];
+  const highlightColors = ["border-primary/20", "border-accent/30", "border-success/20"];
 
   return (
-    <div className="overflow-x-hidden">
-      {/* ── Hero Section ── */}
-      <section id="hero" className="relative min-h-[90vh] flex items-center overflow-hidden">
-        {/* Background image */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/assets/generated/school-hero.dim_1200x500.png"
-            alt="INDO KIDZ School"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/30" />
-        </div>
+    <div className="animate-fade-in">
+      {/* Hero Section */}
+      <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+        <div
+          className="absolute inset-0 bg-gradient-hero animate-gradient"
+          style={{ backgroundSize: "200% 200%" }}
+        />
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: `url('/assets/generated/school-hero.dim_1200x500.png')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
 
-        {/* Decorative shapes */}
-        <div className="absolute top-10 right-10 w-32 h-32 rounded-full bg-primary/20 blur-2xl" />
-        <div className="absolute bottom-20 right-1/3 w-24 h-24 rounded-full bg-accent/30 blur-xl" />
+        {/* Floating decorations */}
+        <div className="absolute top-20 right-10 w-20 h-20 rounded-full bg-accent/30 animate-float" />
+        <div className="absolute bottom-32 left-10 w-14 h-14 rounded-full bg-white/20 animate-float" style={{ animationDelay: "1s" }} />
+        <div className="absolute top-40 left-1/4 w-8 h-8 rounded-full bg-white/15 animate-float" style={{ animationDelay: "2s" }} />
 
-        <div className="container mx-auto px-4 relative z-10 py-20">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/30 rounded-full px-4 py-2 mb-6">
-              <Star size={14} className="text-primary fill-primary" />
-              <span className="text-sm font-bold text-primary">India's Most Innovative School</span>
-            </div>
-
-            {isLoading ? (
-              <>
-                <Skeleton className="h-16 w-3/4 mb-4 rounded-2xl" />
-                <Skeleton className="h-6 w-full mb-2 rounded-xl" />
-                <Skeleton className="h-6 w-5/6 rounded-xl" />
-              </>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="max-w-3xl animate-slide-up">
+            <Badge className="mb-4 bg-accent/20 text-accent border-accent/30 text-sm px-4 py-1">
+              🌟 Bilaspur's Premier School
+            </Badge>
+            {heroLoading ? (
+              <Skeleton className="h-16 w-3/4 mb-4 bg-white/20" />
             ) : (
-              <>
-                <h1 className="font-fredoka text-5xl md:text-7xl text-foreground leading-tight mb-6">
-                  {c.heroText || DEFAULT_CONTENT.heroText}
-                </h1>
-                <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-8 max-w-xl">
-                  {c.tagline || DEFAULT_CONTENT.tagline}
-                </p>
-              </>
+              <h1 className="font-fredoka text-5xl sm:text-6xl lg:text-7xl text-white mb-4 leading-tight">
+                {h.schoolName}
+              </h1>
             )}
-
-            <div className="flex flex-wrap gap-4">
-              <Button
-                size="lg"
-                className="rounded-2xl font-bold text-base px-8 shadow-playful hover:shadow-playful-lg transition-shadow"
-                onClick={() => document.querySelector('#about')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Discover More 🚀
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="rounded-2xl font-bold text-base px-8 border-2"
-                onClick={() => navigate({ to: '/fees' })}
-              >
-                Pay Fees 💳
-              </Button>
+            {heroLoading ? (
+              <Skeleton className="h-8 w-2/3 mb-6 bg-white/20" />
+            ) : (
+              <p className="text-xl sm:text-2xl text-white/90 font-semibold mb-6 leading-relaxed">
+                {h.tagline}
+              </p>
+            )}
+            <div className="flex items-center gap-2 text-white/80 mb-8">
+              <MapPin className="w-5 h-5 text-accent flex-shrink-0" />
+              <span className="text-sm sm:text-base">{h.address}</span>
             </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => navigate({ to: "/admissions" })}
+                className="px-8 py-3 bg-accent text-accent-foreground font-bold rounded-full hover:scale-105 transition-transform shadow-warm flex items-center gap-2"
+              >
+                Apply Now <ChevronRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => navigate({ to: "/contact" })}
+                className="px-8 py-3 bg-white/20 text-white font-bold rounded-full hover:bg-white/30 transition-all border border-white/30 backdrop-blur-sm"
+              >
+                Contact Us
+              </button>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-4 mt-12 max-w-2xl">
+            <StatCard value={`${h.heroStats.studentsEnrolled}+`} label="Students Enrolled" icon={Users} />
+            <StatCard value={`${h.heroStats.yearsOfExcellence}+`} label="Years of Excellence" icon={Award} />
+            <StatCard value={`${h.heroStats.facultyCount}+`} label="Expert Faculty" icon={GraduationCap} />
           </div>
         </div>
       </section>
 
-      {/* ── About Us Section ── */}
-      <section id="about" className="py-20 bg-card">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 bg-accent/20 rounded-full px-4 py-2 mb-4">
-                <Heart size={14} className="text-accent-foreground" />
-                <span className="text-sm font-bold text-accent-foreground">About INDO KIDZ</span>
+      {/* Announcements */}
+      {announcements && announcements.length > 0 && (
+        <section className="bg-accent/10 border-y border-accent/20 py-4">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className="flex items-center gap-2 bg-accent text-accent-foreground px-3 py-1 rounded-full text-sm font-bold flex-shrink-0">
+                <Megaphone className="w-4 h-4" />
+                News
               </div>
-              <h2 className="font-fredoka text-4xl md:text-5xl text-foreground mb-6 leading-tight">
-                A School That Truly Cares 💛
+              <div className="flex gap-8 overflow-x-auto scrollbar-hide">
+                {announcements.map((ann, i) => (
+                  <span key={i} className="text-sm font-medium text-foreground/80 whitespace-nowrap">
+                    📢 <strong>{ann.title}</strong>: {ann.body}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Why INDO KIDZ */}
+      <section className="py-20 bg-gradient-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 animate-slide-up">
+            <Badge className="mb-3 bg-primary/10 text-primary border-primary/20">Why Choose Us</Badge>
+            <h2 className="font-fredoka text-4xl sm:text-5xl text-foreground mb-4">
+              Why INDO KIDZ Stands Out
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+              We believe every child is unique. Our holistic approach ensures academic excellence, character building, and joyful learning.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[h.schoolHighlights.highlight1, h.schoolHighlights.highlight2, h.schoolHighlights.highlight3].map((hl, i) => (
+              <HighlightCard key={i} icon={highlightIcons[i]} title={hl} color={highlightColors[i]} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="animate-slide-up">
+              <Badge className="mb-3 bg-accent/20 text-accent-foreground border-accent/30">About INDO KIDZ</Badge>
+              <h2 className="font-fredoka text-4xl sm:text-5xl text-foreground mb-6">
+                Shaping Tomorrow's Leaders Today
               </h2>
-              {isLoading ? (
-                <div className="space-y-3">
-                  <Skeleton className="h-4 w-full rounded-xl" />
-                  <Skeleton className="h-4 w-5/6 rounded-xl" />
-                  <Skeleton className="h-4 w-4/5 rounded-xl" />
-                  <Skeleton className="h-4 w-full rounded-xl" />
-                </div>
-              ) : (
-                <p className="text-muted-foreground leading-relaxed text-lg">
-                  {c.aboutUs || DEFAULT_CONTENT.aboutUs}
-                </p>
-              )}
-              <div className="mt-8 grid grid-cols-2 gap-4">
+              <p className="text-muted-foreground text-lg leading-relaxed mb-4">
+                INDO KIDZ is Bilaspur's most trusted educational institution, dedicated to nurturing young minds with a perfect blend of academics, arts, sports, and values. Our state-of-the-art campus provides an inspiring environment where curiosity thrives.
+              </p>
+              <p className="text-muted-foreground text-lg leading-relaxed mb-6">
+                With over 9 years of excellence, we have produced hundreds of successful students who have gone on to achieve great things. Our dedicated faculty, innovative curriculum, and supportive community make INDO KIDZ the first choice for parents who want the best for their children.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
                 {[
-                  { icon: '🎯', text: 'Goal-Oriented' },
-                  { icon: '🌱', text: 'Nurturing Growth' },
-                  { icon: '🤗', text: 'Inclusive Community' },
-                  { icon: '✨', text: 'Excellence in Education' },
-                ].map((item) => (
-                  <div key={item.text} className="flex items-center gap-2 bg-secondary rounded-2xl px-4 py-3">
-                    <span className="text-xl">{item.icon}</span>
-                    <span className="font-semibold text-sm">{item.text}</span>
+                  { icon: BookOpen, label: "CBSE Curriculum", desc: "Nationally recognized" },
+                  { icon: Zap, label: "Smart Classes", desc: "Digital learning" },
+                  { icon: Heart, label: "Holistic Growth", desc: "Mind, body & soul" },
+                  { icon: Star, label: "Award Winning", desc: "State recognized" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-muted/50">
+                    <item.icon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-semibold text-sm">{item.label}</p>
+                      <p className="text-xs text-muted-foreground">{item.desc}</p>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
             <div className="relative">
-              <div className="rounded-3xl overflow-hidden shadow-playful-lg border-4 border-primary/20">
-                <img
-                  src="/assets/generated/kids-learning.dim_800x400.png"
-                  alt="Kids Learning at INDO KIDZ"
-                  className="w-full h-80 object-cover"
-                />
+              <img
+                src="/assets/generated/kids-learning.dim_800x400.png"
+                alt="Students learning at INDO KIDZ"
+                className="rounded-3xl shadow-playful w-full object-cover"
+              />
+              <div className="absolute -bottom-4 -left-4 bg-accent text-accent-foreground p-4 rounded-2xl shadow-warm">
+                <p className="font-fredoka text-2xl">250+</p>
+                <p className="text-xs font-semibold">Happy Students</p>
               </div>
-              {/* Floating badge */}
-              <div className="absolute -bottom-4 -left-4 bg-primary text-primary-foreground rounded-2xl px-5 py-3 shadow-playful font-bold text-sm">
-                🏆 Award-Winning School
-              </div>
-              <div className="absolute -top-4 -right-4 bg-accent text-accent-foreground rounded-2xl px-4 py-2 shadow-playful font-bold text-sm">
-                ⭐ Top Rated
+              <div className="absolute -top-4 -right-4 bg-primary text-white p-4 rounded-2xl shadow-playful">
+                <p className="font-fredoka text-2xl">9+</p>
+                <p className="text-xs font-semibold">Years of Trust</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Banner Decoration ── */}
-      <div className="w-full overflow-hidden h-40 relative">
-        <img
-          src="/assets/generated/banner-decoration.dim_1200x300.png"
-          alt="Decorative Banner"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <h3 className="font-fredoka text-3xl md:text-4xl text-white drop-shadow-lg text-center px-4">
-            🌈 Learning is an Adventure! 🌈
-          </h3>
-        </div>
-      </div>
-
-      {/* ── Visit Us / Location Section ── */}
-      <section id="location" className="py-16 bg-card">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-2 mb-4">
-              <MapPin size={14} className="text-primary" />
-              <span className="text-sm font-bold text-primary">Find Us</span>
+      {/* Fee Preview */}
+      {fees && fees.length > 0 && (
+        <section className="py-20 bg-gradient-section">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <Badge className="mb-3 bg-primary/10 text-primary border-primary/20">Transparent Pricing</Badge>
+              <h2 className="font-fredoka text-4xl sm:text-5xl text-foreground mb-4">Fee Structure</h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">Affordable quality education with transparent fee structure</p>
             </div>
-            <h2 className="font-fredoka text-4xl md:text-5xl text-foreground mb-6">
-              Visit Us 📍
-            </h2>
-            {isLoading ? (
-              <Skeleton className="h-20 w-full rounded-2xl" />
-            ) : (
-              <div className="bg-background rounded-3xl border-2 border-primary/20 shadow-playful px-8 py-7 inline-flex items-start gap-4 text-left w-full">
-                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <MapPin size={22} className="text-primary" />
-                </div>
-                <div>
-                  <p className="font-bold text-foreground text-base mb-1">INDO KIDZ School</p>
-                  <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                    {address}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Contact Us Section ── */}
-      <section id="contact" className="py-16 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-accent/20 rounded-full px-4 py-2 mb-4">
-              <Phone size={14} className="text-accent-foreground" />
-              <span className="text-sm font-bold text-accent-foreground">Get In Touch</span>
-            </div>
-            <h2 className="font-fredoka text-4xl md:text-5xl text-foreground mb-6">
-              Contact Us 📞
-            </h2>
-            {isLoading ? (
-              <Skeleton className="h-24 w-full rounded-2xl" />
-            ) : (
-              <div className="bg-card rounded-3xl border-2 border-accent/30 shadow-playful px-8 py-7 text-left w-full">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Mail size={22} className="text-accent-foreground" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-foreground text-base mb-2">INDO KIDZ School</p>
-                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                      {contactInfo}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Fees Preview Section ── */}
-      {feeCategories && feeCategories.length > 0 && (
-        <section id="fees-preview" className="py-20 bg-secondary/30">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="font-fredoka text-4xl md:text-5xl text-foreground mb-4">
-              School Fees 💳
-            </h2>
-            <p className="text-muted-foreground text-lg mb-10">
-              Transparent and affordable fee structure for all families.
-            </p>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto mb-10">
-              {feeCategories.slice(0, 3).map((fee) => (
-                <div key={fee.title} className="bg-card rounded-3xl p-6 border-2 border-primary/20 shadow-playful">
-                  <div className="font-fredoka text-xl text-foreground mb-2">{fee.title}</div>
-                  <div className="text-3xl font-bold text-primary">
-                    ₹ {Number(fee.amount).toLocaleString('en-IN')}
-                  </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+              {fees.slice(0, 6).map((fee) => (
+                <div key={fee.id.toString()} className="bg-white rounded-2xl p-5 shadow-card card-hover border border-border">
+                  <p className="font-semibold text-foreground">{fee.name}</p>
+                  <p className="font-fredoka text-2xl text-primary mt-1">₹{fee.amount.toString()}</p>
+                  <p className="text-xs text-muted-foreground mt-1">per year</p>
                 </div>
               ))}
             </div>
-            <Button
-              size="lg"
-              className="rounded-2xl font-bold text-base px-10 shadow-playful"
-              onClick={() => (window.location.href = '/fees')}
-            >
-              View All & Pay Now 💳
-            </Button>
+            <div className="text-center mt-8">
+              <button
+                onClick={() => navigate({ to: "/fee-structure" })}
+                className="px-8 py-3 bg-gradient-hero text-white font-bold rounded-full hover:opacity-90 transition-opacity shadow-playful"
+              >
+                View Full Fee Structure
+              </button>
+            </div>
           </div>
         </section>
       )}
 
-      {/* ── CTA Section ── */}
-      <section className="py-20 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="font-fredoka text-4xl md:text-5xl mb-4">
-            Ready to Join the INDO KIDZ Family? 🎉
+      {/* Testimonials */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <Badge className="mb-3 bg-accent/20 text-accent-foreground border-accent/30">Testimonials</Badge>
+            <h2 className="font-fredoka text-4xl sm:text-5xl text-foreground mb-4">What Parents Say</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {h.testimonials.map((t, i) => (
+              <div key={i} className="bg-gradient-section rounded-2xl p-6 border border-border card-hover">
+                <div className="flex gap-1 mb-3">
+                  {[...Array(5)].map((_, j) => (
+                    <Star key={j} className="w-4 h-4 fill-accent text-accent" />
+                  ))}
+                </div>
+                <p className="text-muted-foreground italic mb-4">"{t.feedback}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-hero flex items-center justify-center text-white font-fredoka">
+                    {t.name[0]}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm">{t.name}</p>
+                    <p className="text-xs text-muted-foreground">{t.designation}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 bg-gradient-hero relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `url('/assets/generated/pattern-bg.dim_400x400.png')`, backgroundRepeat: "repeat" }} />
+        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+          <h2 className="font-fredoka text-4xl sm:text-5xl text-white mb-4">
+            Ready to Join the INDO KIDZ Family?
           </h2>
-          <p className="text-lg opacity-90 mb-8 max-w-xl mx-auto">
-            Give your child the gift of joyful, innovative learning. Enroll today!
+          <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
+            Give your child the gift of quality education in a nurturing, innovative environment. Admissions are open now!
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Button
-              size="lg"
-              variant="secondary"
-              className="rounded-2xl font-bold text-base px-10 shadow-playful"
-              onClick={() => document.querySelector('#about')?.scrollIntoView({ behavior: 'smooth' })}
+            <button
+              onClick={() => navigate({ to: "/admissions" })}
+              className="px-10 py-4 bg-accent text-accent-foreground font-bold rounded-full hover:scale-105 transition-transform shadow-warm text-lg"
             >
-              Learn More 📚
-            </Button>
-            <Button
-              size="lg"
-              className="rounded-2xl font-bold text-base px-10 bg-foreground text-background hover:bg-foreground/90"
-              onClick={() => (window.location.href = '/fees')}
+              Apply for Admission 🎓
+            </button>
+            <button
+              onClick={() => navigate({ to: "/contact" })}
+              className="px-10 py-4 bg-white/20 text-white font-bold rounded-full hover:bg-white/30 transition-all border border-white/30 text-lg"
             >
-              Pay Fees Now 💳
-            </Button>
+              Get in Touch
+            </button>
           </div>
         </div>
       </section>

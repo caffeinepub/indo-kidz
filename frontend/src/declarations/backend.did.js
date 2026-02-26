@@ -13,63 +13,140 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
-export const PaymentStatus = IDL.Variant({
-  'pending' : IDL.Null,
-  'paid' : IDL.Null,
-  'unpaid' : IDL.Null,
+export const AdmissionsContent = IDL.Record({
+  'faq' : IDL.Text,
+  'applicationSteps' : IDL.Text,
+  'portalLink' : IDL.Text,
+  'documents' : IDL.Text,
+  'eligibility' : IDL.Text,
+  'process' : IDL.Text,
 });
-export const FeePaymentRecord = IDL.Record({
-  'status' : PaymentStatus,
-  'studentName' : IDL.Text,
-  'feeTitle' : IDL.Text,
-  'recordId' : IDL.Nat,
-  'amount' : IDL.Nat,
-});
-export const UserProfile = IDL.Record({ 'name' : IDL.Text });
-export const FeeCategory = IDL.Record({
+export const Announcement = IDL.Record({
   'title' : IDL.Text,
+  'body' : IDL.Text,
+  'date' : IDL.Text,
+});
+export const UserProfile = IDL.Record({
+  'contactInfo' : IDL.Text,
+  'name' : IDL.Text,
+});
+export const FeeCategory = IDL.Record({
+  'id' : IDL.Nat,
+  'name' : IDL.Text,
   'amount' : IDL.Nat,
 });
-export const HomepageContent = IDL.Record({
-  'contactInfo' : IDL.Text,
-  'aboutUs' : IDL.Text,
+export const Photo = IDL.Record({
+  'id' : IDL.Nat,
+  'url' : IDL.Text,
+  'caption' : IDL.Text,
+});
+export const HeroStats = IDL.Record({
+  'facultyCount' : IDL.Nat,
+  'yearsOfExcellence' : IDL.Nat,
+  'studentsEnrolled' : IDL.Nat,
+});
+export const SchoolHighlights = IDL.Record({
+  'highlight1' : IDL.Text,
+  'highlight2' : IDL.Text,
+  'highlight3' : IDL.Text,
+});
+export const Testimonial = IDL.Record({
+  'name' : IDL.Text,
+  'designation' : IDL.Text,
+  'feedback' : IDL.Text,
+});
+export const HomeHeroSection = IDL.Record({
   'tagline' : IDL.Text,
-  'learningMethods' : IDL.Text,
-  'studentConnection' : IDL.Text,
-  'heroText' : IDL.Text,
-  'schoolAddress' : IDL.Text,
+  'heroStats' : HeroStats,
+  'address' : IDL.Text,
+  'schoolHighlights' : SchoolHighlights,
+  'testimonials' : IDL.Vec(Testimonial),
+  'schoolName' : IDL.Text,
+});
+export const SchoolInfo = IDL.Record({
+  'instagramLink' : IDL.Text,
+  'twitterLink' : IDL.Text,
+  'adminContactInfo' : IDL.Text,
+  'website' : IDL.Text,
+  'address' : IDL.Text,
+  'principalName' : IDL.Text,
+  'facebookLink' : IDL.Text,
+  'emailAddress' : IDL.Text,
+  'phoneNumber' : IDL.Text,
+  'schoolName' : IDL.Text,
+});
+export const ThemeSettings = IDL.Record({
+  'primaryColor' : IDL.Text,
+  'accentColor' : IDL.Text,
+  'fontChoice' : IDL.Text,
 });
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
-  'addFeeCategory' : IDL.Func([IDL.Text, IDL.Nat], [], []),
+  'addAnnouncement' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Nat], []),
+  'addFeeCategory' : IDL.Func([IDL.Text, IDL.Nat], [IDL.Nat], []),
+  'addPhoto' : IDL.Func([IDL.Text, IDL.Text], [IDL.Nat], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'deleteFeeCategory' : IDL.Func([IDL.Text], [], []),
-  'getAllPaymentRecords' : IDL.Func([], [IDL.Vec(FeePaymentRecord)], ['query']),
+  'deleteAnnouncement' : IDL.Func([IDL.Nat], [], []),
+  'deleteFeeCategory' : IDL.Func([IDL.Nat], [], []),
+  'deletePhoto' : IDL.Func([IDL.Nat], [], []),
+  'getAdmissionsContent' : IDL.Func([], [AdmissionsContent], ['query']),
+  'getAllAnnouncements' : IDL.Func([], [IDL.Vec(Announcement)], ['query']),
+  'getAnnouncement' : IDL.Func([IDL.Nat], [Announcement], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getFeeCategories' : IDL.Func([], [IDL.Vec(FeeCategory)], ['query']),
-  'getHomepageContent' : IDL.Func([], [HomepageContent], ['query']),
-  'getPaymentRecord' : IDL.Func([IDL.Nat], [FeePaymentRecord], ['query']),
-  'getStudentRecords' : IDL.Func(
-      [IDL.Text],
-      [IDL.Vec(FeePaymentRecord)],
-      ['query'],
-    ),
+  'getGallery' : IDL.Func([], [IDL.Vec(Photo)], ['query']),
+  'getHomeHeroSection' : IDL.Func([], [HomeHeroSection], ['query']),
+  'getSchoolInfo' : IDL.Func([], [SchoolInfo], ['query']),
+  'getThemeSettings' : IDL.Func([], [ThemeSettings], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
-  'hasOwner' : IDL.Func([], [IDL.Bool], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-  'isOwner' : IDL.Func([], [IDL.Bool], ['query']),
-  'registerOwner' : IDL.Func([], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-  'submitFeePayment' : IDL.Func([IDL.Text, IDL.Text, IDL.Nat], [IDL.Nat], []),
-  'updateFeeCategory' : IDL.Func([IDL.Text, IDL.Nat], [], []),
-  'updateHomepageContent' : IDL.Func([HomepageContent], [], []),
-  'updatePaymentStatus' : IDL.Func([IDL.Nat, PaymentStatus], [], []),
+  'updateAdmissionsContent' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+      [],
+      [],
+    ),
+  'updateAnnouncement' : IDL.Func(
+      [IDL.Nat, IDL.Text, IDL.Text, IDL.Text],
+      [],
+      [],
+    ),
+  'updateFeeCategory' : IDL.Func([IDL.Nat, IDL.Text, IDL.Nat], [], []),
+  'updateHomeHeroSection' : IDL.Func(
+      [
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        HeroStats,
+        SchoolHighlights,
+        IDL.Vec(Testimonial),
+      ],
+      [],
+      [],
+    ),
+  'updateSchoolInfo' : IDL.Func(
+      [
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+      ],
+      [],
+      [],
+    ),
+  'updateThemeSettings' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
 });
 
 export const idlInitArgs = [];
@@ -80,64 +157,140 @@ export const idlFactory = ({ IDL }) => {
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
-  const PaymentStatus = IDL.Variant({
-    'pending' : IDL.Null,
-    'paid' : IDL.Null,
-    'unpaid' : IDL.Null,
+  const AdmissionsContent = IDL.Record({
+    'faq' : IDL.Text,
+    'applicationSteps' : IDL.Text,
+    'portalLink' : IDL.Text,
+    'documents' : IDL.Text,
+    'eligibility' : IDL.Text,
+    'process' : IDL.Text,
   });
-  const FeePaymentRecord = IDL.Record({
-    'status' : PaymentStatus,
-    'studentName' : IDL.Text,
-    'feeTitle' : IDL.Text,
-    'recordId' : IDL.Nat,
+  const Announcement = IDL.Record({
+    'title' : IDL.Text,
+    'body' : IDL.Text,
+    'date' : IDL.Text,
+  });
+  const UserProfile = IDL.Record({
+    'contactInfo' : IDL.Text,
+    'name' : IDL.Text,
+  });
+  const FeeCategory = IDL.Record({
+    'id' : IDL.Nat,
+    'name' : IDL.Text,
     'amount' : IDL.Nat,
   });
-  const UserProfile = IDL.Record({ 'name' : IDL.Text });
-  const FeeCategory = IDL.Record({ 'title' : IDL.Text, 'amount' : IDL.Nat });
-  const HomepageContent = IDL.Record({
-    'contactInfo' : IDL.Text,
-    'aboutUs' : IDL.Text,
+  const Photo = IDL.Record({
+    'id' : IDL.Nat,
+    'url' : IDL.Text,
+    'caption' : IDL.Text,
+  });
+  const HeroStats = IDL.Record({
+    'facultyCount' : IDL.Nat,
+    'yearsOfExcellence' : IDL.Nat,
+    'studentsEnrolled' : IDL.Nat,
+  });
+  const SchoolHighlights = IDL.Record({
+    'highlight1' : IDL.Text,
+    'highlight2' : IDL.Text,
+    'highlight3' : IDL.Text,
+  });
+  const Testimonial = IDL.Record({
+    'name' : IDL.Text,
+    'designation' : IDL.Text,
+    'feedback' : IDL.Text,
+  });
+  const HomeHeroSection = IDL.Record({
     'tagline' : IDL.Text,
-    'learningMethods' : IDL.Text,
-    'studentConnection' : IDL.Text,
-    'heroText' : IDL.Text,
-    'schoolAddress' : IDL.Text,
+    'heroStats' : HeroStats,
+    'address' : IDL.Text,
+    'schoolHighlights' : SchoolHighlights,
+    'testimonials' : IDL.Vec(Testimonial),
+    'schoolName' : IDL.Text,
+  });
+  const SchoolInfo = IDL.Record({
+    'instagramLink' : IDL.Text,
+    'twitterLink' : IDL.Text,
+    'adminContactInfo' : IDL.Text,
+    'website' : IDL.Text,
+    'address' : IDL.Text,
+    'principalName' : IDL.Text,
+    'facebookLink' : IDL.Text,
+    'emailAddress' : IDL.Text,
+    'phoneNumber' : IDL.Text,
+    'schoolName' : IDL.Text,
+  });
+  const ThemeSettings = IDL.Record({
+    'primaryColor' : IDL.Text,
+    'accentColor' : IDL.Text,
+    'fontChoice' : IDL.Text,
   });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
-    'addFeeCategory' : IDL.Func([IDL.Text, IDL.Nat], [], []),
+    'addAnnouncement' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Nat], []),
+    'addFeeCategory' : IDL.Func([IDL.Text, IDL.Nat], [IDL.Nat], []),
+    'addPhoto' : IDL.Func([IDL.Text, IDL.Text], [IDL.Nat], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'deleteFeeCategory' : IDL.Func([IDL.Text], [], []),
-    'getAllPaymentRecords' : IDL.Func(
-        [],
-        [IDL.Vec(FeePaymentRecord)],
-        ['query'],
-      ),
+    'deleteAnnouncement' : IDL.Func([IDL.Nat], [], []),
+    'deleteFeeCategory' : IDL.Func([IDL.Nat], [], []),
+    'deletePhoto' : IDL.Func([IDL.Nat], [], []),
+    'getAdmissionsContent' : IDL.Func([], [AdmissionsContent], ['query']),
+    'getAllAnnouncements' : IDL.Func([], [IDL.Vec(Announcement)], ['query']),
+    'getAnnouncement' : IDL.Func([IDL.Nat], [Announcement], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getFeeCategories' : IDL.Func([], [IDL.Vec(FeeCategory)], ['query']),
-    'getHomepageContent' : IDL.Func([], [HomepageContent], ['query']),
-    'getPaymentRecord' : IDL.Func([IDL.Nat], [FeePaymentRecord], ['query']),
-    'getStudentRecords' : IDL.Func(
-        [IDL.Text],
-        [IDL.Vec(FeePaymentRecord)],
-        ['query'],
-      ),
+    'getGallery' : IDL.Func([], [IDL.Vec(Photo)], ['query']),
+    'getHomeHeroSection' : IDL.Func([], [HomeHeroSection], ['query']),
+    'getSchoolInfo' : IDL.Func([], [SchoolInfo], ['query']),
+    'getThemeSettings' : IDL.Func([], [ThemeSettings], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
-    'hasOwner' : IDL.Func([], [IDL.Bool], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-    'isOwner' : IDL.Func([], [IDL.Bool], ['query']),
-    'registerOwner' : IDL.Func([], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-    'submitFeePayment' : IDL.Func([IDL.Text, IDL.Text, IDL.Nat], [IDL.Nat], []),
-    'updateFeeCategory' : IDL.Func([IDL.Text, IDL.Nat], [], []),
-    'updateHomepageContent' : IDL.Func([HomepageContent], [], []),
-    'updatePaymentStatus' : IDL.Func([IDL.Nat, PaymentStatus], [], []),
+    'updateAdmissionsContent' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+        [],
+        [],
+      ),
+    'updateAnnouncement' : IDL.Func(
+        [IDL.Nat, IDL.Text, IDL.Text, IDL.Text],
+        [],
+        [],
+      ),
+    'updateFeeCategory' : IDL.Func([IDL.Nat, IDL.Text, IDL.Nat], [], []),
+    'updateHomeHeroSection' : IDL.Func(
+        [
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          HeroStats,
+          SchoolHighlights,
+          IDL.Vec(Testimonial),
+        ],
+        [],
+        [],
+      ),
+    'updateSchoolInfo' : IDL.Func(
+        [
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+        ],
+        [],
+        [],
+      ),
+    'updateThemeSettings' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
   });
 };
 

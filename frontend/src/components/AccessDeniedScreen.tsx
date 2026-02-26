@@ -1,23 +1,21 @@
-import { Link } from '@tanstack/react-router';
-import { ShieldX } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useNavigate } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
+import { ShieldX } from "lucide-react";
 
 export default function AccessDeniedScreen() {
+  const navigate = useNavigate();
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
-      <div className="text-8xl mb-6 animate-bounce-slow">🔒</div>
-      <div className="bg-card rounded-3xl border-2 border-destructive/30 p-10 max-w-md shadow-playful-lg">
-        <ShieldX size={48} className="text-destructive mx-auto mb-4" />
-        <h2 className="font-fredoka text-3xl text-foreground mb-3">Access Denied</h2>
-        <p className="text-muted-foreground mb-6 leading-relaxed">
-          Oops! This area is only for the school owner. You don't have permission to view this page.
-        </p>
-        <Link to="/">
-          <Button className="rounded-2xl font-bold px-8">
-            🏠 Back to Homepage
-          </Button>
-        </Link>
+      <div className="w-20 h-20 rounded-full bg-destructive/10 flex items-center justify-center mb-6">
+        <ShieldX className="w-10 h-10 text-destructive" />
       </div>
+      <h1 className="font-fredoka text-4xl text-foreground mb-3">Access Denied</h1>
+      <p className="text-muted-foreground max-w-md mb-6">
+        You don't have permission to access this page. Only the school administrator can access the customization panel.
+      </p>
+      <Button onClick={() => navigate({ to: "/" })} className="bg-gradient-hero text-white hover:opacity-90">
+        Back to Home
+      </Button>
     </div>
   );
 }

@@ -2,10 +2,30 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-ensure-the-admin-panel-page-enforces-owner-only-access-at-the-route-component-level-if-a-non-owner-navigates-directly-to-the-admin-route-they-must-see-the-accessdeniedscreen-and-must-not-be-shown-the-customize-fee-category-payment-tabs-do-not-change-any-other-functionality",
-      "featureTitle": "Ensure the Admin Panel page enforces owner-only access at the route/component level. If a non-owner navigates directly to the admin route, they must see the AccessDeniedScreen and must not be shown the Customize/Fee Category/Payment tabs. Do not change any other functionality.",
+      "featureId": "feature-fix-the-customize-tab-admin-navigation-button-in-the-navbar-so-it-becomes-visible-immediately-after-an-admin-user-logs-in-with-internet-identity-the-tab-must-reliably-appear-for-admin-users-and-remain-hidden-for-non-admin-or-unauthenticated-users",
+      "featureTitle": "Fix the Customize tab (admin navigation button) in the Navbar so it becomes visible immediately after an admin user logs in with Internet Identity. The tab must reliably appear for admin users and remain hidden for non-admin or unauthenticated users.",
       "files": [
-        "frontend/src/pages/AdminPanel.tsx"
+        "frontend/src/components/Navbar.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-ensure-the-admin-status-check-in-navbar-tsx-correctly-reads-from-the-useisadmin-query-or-equivalent-hook-in-usequeries-ts-and-that-the-query-is-invalidated-and-refetched-after-login-so-the-customize-tab-appears-reactively-debug-and-fix-any-stale-query-or-timing-issue-that-prevents-the-admin-flag-from-being-truthy-after-authentication",
+      "featureTitle": "Ensure the admin status check in Navbar.tsx correctly reads from the useIsAdmin query (or equivalent hook in useQueries.ts) and that the query is invalidated and refetched after login so the Customize tab appears reactively. Debug and fix any stale-query or timing issue that prevents the admin flag from being truthy after authentication.",
+      "files": [
+        "frontend/src/components/Navbar.tsx",
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "authorization@4.0.0",

@@ -10,52 +10,120 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
-export interface FeeCategory { 'title' : string, 'amount' : bigint }
-export interface FeePaymentRecord {
-  'status' : PaymentStatus,
-  'studentName' : string,
-  'feeTitle' : string,
-  'recordId' : bigint,
+export interface AdmissionsContent {
+  'faq' : string,
+  'applicationSteps' : string,
+  'portalLink' : string,
+  'documents' : string,
+  'eligibility' : string,
+  'process' : string,
+}
+export interface Announcement {
+  'title' : string,
+  'body' : string,
+  'date' : string,
+}
+export interface FeeCategory {
+  'id' : bigint,
+  'name' : string,
   'amount' : bigint,
 }
-export interface HomepageContent {
-  'contactInfo' : string,
-  'aboutUs' : string,
-  'tagline' : string,
-  'learningMethods' : string,
-  'studentConnection' : string,
-  'heroText' : string,
-  'schoolAddress' : string,
+export interface HeroStats {
+  'facultyCount' : bigint,
+  'yearsOfExcellence' : bigint,
+  'studentsEnrolled' : bigint,
 }
-export type PaymentStatus = { 'pending' : null } |
-  { 'paid' : null } |
-  { 'unpaid' : null };
-export interface UserProfile { 'name' : string }
+export interface HomeHeroSection {
+  'tagline' : string,
+  'heroStats' : HeroStats,
+  'address' : string,
+  'schoolHighlights' : SchoolHighlights,
+  'testimonials' : Array<Testimonial>,
+  'schoolName' : string,
+}
+export interface Photo { 'id' : bigint, 'url' : string, 'caption' : string }
+export interface SchoolHighlights {
+  'highlight1' : string,
+  'highlight2' : string,
+  'highlight3' : string,
+}
+export interface SchoolInfo {
+  'instagramLink' : string,
+  'twitterLink' : string,
+  'adminContactInfo' : string,
+  'website' : string,
+  'address' : string,
+  'principalName' : string,
+  'facebookLink' : string,
+  'emailAddress' : string,
+  'phoneNumber' : string,
+  'schoolName' : string,
+}
+export interface Testimonial {
+  'name' : string,
+  'designation' : string,
+  'feedback' : string,
+}
+export interface ThemeSettings {
+  'primaryColor' : string,
+  'accentColor' : string,
+  'fontChoice' : string,
+}
+export interface UserProfile { 'contactInfo' : string, 'name' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
-  'addFeeCategory' : ActorMethod<[string, bigint], undefined>,
+  'addAnnouncement' : ActorMethod<[string, string, string], bigint>,
+  'addFeeCategory' : ActorMethod<[string, bigint], bigint>,
+  'addPhoto' : ActorMethod<[string, string], bigint>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'deleteFeeCategory' : ActorMethod<[string], undefined>,
-  'getAllPaymentRecords' : ActorMethod<[], Array<FeePaymentRecord>>,
+  'deleteAnnouncement' : ActorMethod<[bigint], undefined>,
+  'deleteFeeCategory' : ActorMethod<[bigint], undefined>,
+  'deletePhoto' : ActorMethod<[bigint], undefined>,
+  'getAdmissionsContent' : ActorMethod<[], AdmissionsContent>,
+  'getAllAnnouncements' : ActorMethod<[], Array<Announcement>>,
+  'getAnnouncement' : ActorMethod<[bigint], Announcement>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getFeeCategories' : ActorMethod<[], Array<FeeCategory>>,
-  'getHomepageContent' : ActorMethod<[], HomepageContent>,
-  'getPaymentRecord' : ActorMethod<[bigint], FeePaymentRecord>,
-  'getStudentRecords' : ActorMethod<[string], Array<FeePaymentRecord>>,
+  'getGallery' : ActorMethod<[], Array<Photo>>,
+  'getHomeHeroSection' : ActorMethod<[], HomeHeroSection>,
+  'getSchoolInfo' : ActorMethod<[], SchoolInfo>,
+  'getThemeSettings' : ActorMethod<[], ThemeSettings>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
-  'hasOwner' : ActorMethod<[], boolean>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
-  'isOwner' : ActorMethod<[], boolean>,
-  'registerOwner' : ActorMethod<[], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
-  'submitFeePayment' : ActorMethod<[string, string, bigint], bigint>,
-  'updateFeeCategory' : ActorMethod<[string, bigint], undefined>,
-  'updateHomepageContent' : ActorMethod<[HomepageContent], undefined>,
-  'updatePaymentStatus' : ActorMethod<[bigint, PaymentStatus], undefined>,
+  'updateAdmissionsContent' : ActorMethod<
+    [string, string, string, string, string, string],
+    undefined
+  >,
+  'updateAnnouncement' : ActorMethod<
+    [bigint, string, string, string],
+    undefined
+  >,
+  'updateFeeCategory' : ActorMethod<[bigint, string, bigint], undefined>,
+  'updateHomeHeroSection' : ActorMethod<
+    [string, string, string, HeroStats, SchoolHighlights, Array<Testimonial>],
+    undefined
+  >,
+  'updateSchoolInfo' : ActorMethod<
+    [
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+    ],
+    undefined
+  >,
+  'updateThemeSettings' : ActorMethod<[string, string, string], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

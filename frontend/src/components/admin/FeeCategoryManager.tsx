@@ -31,25 +31,26 @@ export default function FeeCategoryManager() {
   const { mutate: updateCategory, isPending: isUpdating } = useUpdateFeeCategory();
   const { mutate: deleteCategory, isPending: isDeleting } = useDeleteFeeCategory();
 
-  const [newTitle, setNewTitle] = useState('');
+  const [newName, setNewName] = useState('');
   const [newAmount, setNewAmount] = useState('');
-  const [editingTitle, setEditingTitle] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<bigint | null>(null);
+  const [editName, setEditName] = useState('');
   const [editAmount, setEditAmount] = useState('');
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle.trim() || !newAmount) return;
+    if (!newName.trim() || !newAmount) return;
     const amount = parseInt(newAmount, 10);
     if (isNaN(amount) || amount < 0) {
       toast.error('Please enter a valid amount.');
       return;
     }
     addCategory(
-      { title: newTitle.trim(), amount: BigInt(amount) },
+      { name: newName.trim(), amount: BigInt(amount) },
       {
         onSuccess: () => {
-          toast.success(`Fee category "${newTitle.trim()}" added! ✅`);
-          setNewTitle('');
+          toast.success(`Fee category "${newName.trim()}" added! ✅`);
+          setNewName('');
           setNewAmount('');
         },
         onError: (err) => {
@@ -61,22 +62,35 @@ export default function FeeCategoryManager() {
   };
 
   const handleEditStart = (cat: FeeCategory) => {
-    setEditingTitle(cat.title);
+    setEditingId(cat.id);
+    setEditName(cat.name);
     setEditAmount(cat.amount.toString());
   };
 
-  const handleEditSave = (title: string) => {
+  const handleEditCancel = () => {
+    setEditingId(null);
+    setEditName('');
+    setEditAmount('');
+  };
+
+  const handleEditSave = (cat: FeeCategory) => {
     const amount = parseInt(editAmount, 10);
     if (isNaN(amount) || amount < 0) {
       toast.error('Please enter a valid amount.');
       return;
     }
+    if (!editName.trim()) {
+      toast.error('Category name cannot be empty.');
+      return;
+    }
     updateCategory(
-      { title, amount: BigInt(amount) },
+      { id: cat.id, name: editName.trim(), amount: BigInt(amount) },
       {
         onSuccess: () => {
-          toast.success(`Fee category "${title}" updated! ✅`);
-          setEditingTitle(null);
+          toast.success(`Fee category updated! ✅`);
+          setEditingId(null);
+          setEditName('');
+          setEditAmount('');
         },
         onError: (err) => {
           toast.error('Failed to update fee category.');
@@ -86,10 +100,10 @@ export default function FeeCategoryManager() {
     );
   };
 
-  const handleDelete = (title: string) => {
-    deleteCategory(title, {
+  const handleDelete = (cat: FeeCategory) => {
+    deleteCategory(cat.id, {
       onSuccess: () => {
-        toast.success(`Fee category "${title}" deleted.`);
+        toast.success(`Fee category "${cat.name}" deleted.`);
       },
       onError: (err) => {
         toast.error('Failed to delete fee category.');
@@ -109,25 +123,25 @@ export default function FeeCategoryManager() {
         <CardContent>
           <form onSubmit={handleAdd} className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1 space-y-1">
-              <Label htmlFor="newTitle" className="font-bold text-sm">Category Name</Label>
+              <Label htmlFor="newName" className="font-bold text-sm">Category Name</Label>
               <Input
-                id="newTitle"
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
+                id="newName"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
                 placeholder="e.g., Tuition Fee, Activity Fee"
                 className="rounded-2xl border-2 focus:border-primary"
                 required
               />
             </div>
             <div className="w-full sm:w-48 space-y-1">
-              <Label htmlFor="newAmount" className="font-bold text-sm">Amount (Rp)</Label>
+              <Label htmlFor="newAmount" className="font-bold text-sm">Amount (₹)</Label>
               <Input
                 id="newAmount"
                 type="number"
                 min="0"
                 value={newAmount}
                 onChange={(e) => setNewAmount(e.target.value)}
-                placeholder="e.g., 500000"
+                placeholder="e.g., 1000"
                 className="rounded-2xl border-2 focus:border-primary"
                 required
               />
@@ -135,7 +149,7 @@ export default function FeeCategoryManager() {
             <div className="flex items-end">
               <Button
                 type="submit"
-                disabled={isAdding || !newTitle.trim() || !newAmount}
+                disabled={isAdding || !newName.trim() || !newAmount}
                 className="rounded-2xl font-bold flex items-center gap-2 w-full sm:w-auto"
               >
                 <Plus size={16} />
@@ -163,54 +177,68 @@ export default function FeeCategoryManager() {
             <div className="space-y-3">
               {categories.map((cat) => (
                 <div
-                  key={cat.title}
+                  key={cat.id.toString()}
                   className="flex items-center gap-3 bg-secondary/50 rounded-2xl p-4 border border-border"
                 >
-                  {editingTitle === cat.title ? (
+                  {editingId === cat.id ? (
                     <>
-                      <div className="flex-1 font-semibold text-foreground">{cat.title}</div>
+                      <div className="flex-1">
+                        <Input
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                          className="rounded-xl border-2 focus:border-primary h-9 mb-2"
+                          placeholder="Category name"
+                          autoFocus
+                        />
+                      </div>
                       <Input
                         type="number"
                         min="0"
                         value={editAmount}
                         onChange={(e) => setEditAmount(e.target.value)}
                         className="w-36 rounded-xl border-2 focus:border-primary h-9"
-                        autoFocus
+                        placeholder="Amount"
                       />
                       <Button
                         size="icon"
                         variant="ghost"
-                        onClick={() => handleEditSave(cat.title)}
+                        onClick={() => handleEditSave(cat)}
                         disabled={isUpdating}
-                        className="rounded-xl text-success hover:bg-success/10"
+                        className="rounded-xl text-green-600 hover:text-green-700 hover:bg-green-50"
+                        title="Save"
                       >
-                        <Check size={16} />
+                        {isUpdating ? (
+                          <RefreshCw size={16} className="animate-spin" />
+                        ) : (
+                          <Check size={16} />
+                        )}
                       </Button>
                       <Button
                         size="icon"
                         variant="ghost"
-                        onClick={() => setEditingTitle(null)}
-                        className="rounded-xl text-muted-foreground hover:bg-muted"
+                        onClick={handleEditCancel}
+                        disabled={isUpdating}
+                        className="rounded-xl text-muted-foreground hover:text-foreground"
+                        title="Cancel"
                       >
                         <X size={16} />
                       </Button>
                     </>
                   ) : (
                     <>
-                      <div className="flex-1">
-                        <div className="font-bold text-foreground">{cat.title}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-foreground truncate">{cat.name}</div>
                         <div className="text-sm text-muted-foreground">
-                          Rp {Number(cat.amount).toLocaleString('id-ID')}
+                          ₹ {Number(cat.amount).toLocaleString('en-IN')}
                         </div>
-                      </div>
-                      <div className="font-fredoka text-xl text-primary">
-                        Rp {Number(cat.amount).toLocaleString('id-ID')}
                       </div>
                       <Button
                         size="icon"
                         variant="ghost"
                         onClick={() => handleEditStart(cat)}
-                        className="rounded-xl hover:bg-primary/10 hover:text-primary"
+                        disabled={isDeleting}
+                        className="rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10"
+                        title="Edit"
                       >
                         <Pencil size={16} />
                       </Button>
@@ -219,23 +247,26 @@ export default function FeeCategoryManager() {
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="rounded-xl hover:bg-destructive/10 hover:text-destructive"
+                            disabled={isDeleting}
+                            className="rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                            title="Delete"
                           >
                             <Trash2 size={16} />
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent className="rounded-3xl">
                           <AlertDialogHeader>
-                            <AlertDialogTitle className="font-fredoka text-2xl">Delete Fee Category?</AlertDialogTitle>
+                            <AlertDialogTitle className="font-fredoka text-xl">
+                              Delete Fee Category?
+                            </AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure you want to delete "{cat.title}"? This action cannot be undone.
+                              Are you sure you want to delete <strong>"{cat.name}"</strong>? This action cannot be undone.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel className="rounded-2xl">Cancel</AlertDialogCancel>
                             <AlertDialogAction
-                              onClick={() => handleDelete(cat.title)}
-                              disabled={isDeleting}
+                              onClick={() => handleDelete(cat)}
                               className="rounded-2xl bg-destructive hover:bg-destructive/90"
                             >
                               Delete
@@ -250,9 +281,9 @@ export default function FeeCategoryManager() {
             </div>
           ) : (
             <div className="text-center py-10 text-muted-foreground">
-              <div className="text-4xl mb-3">📋</div>
+              <div className="text-4xl mb-3">📂</div>
               <p className="font-semibold">No fee categories yet.</p>
-              <p className="text-sm mt-1">Add your first fee category above.</p>
+              <p className="text-sm mt-1">Add your first category using the form above.</p>
             </div>
           )}
         </CardContent>
@@ -260,3 +291,6 @@ export default function FeeCategoryManager() {
     </div>
   );
 }
+
+// Need to import RefreshCw for the loading spinner in edit mode
+import { RefreshCw } from 'lucide-react';

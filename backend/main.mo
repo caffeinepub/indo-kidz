@@ -1,12 +1,11 @@
 import Map "mo:core/Map";
-import Text "mo:core/Text";
-import Iter "mo:core/Iter";
 import Nat "mo:core/Nat";
-import Order "mo:core/Order";
-import Runtime "mo:core/Runtime";
+import Iter "mo:core/Iter";
+import Array "mo:core/Array";
 import Principal "mo:core/Principal";
-import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+import Runtime "mo:core/Runtime";
+import MixinAuthorization "authorization/MixinAuthorization";
 
 
 
@@ -18,6 +17,7 @@ actor {
 
   public type UserProfile = {
     name : Text;
+    contactInfo : Text;
   };
 
   let userProfiles = Map.empty<Principal, UserProfile>();
@@ -43,199 +43,348 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // ========== WEBSITE CONTENT DATA TYPES ==========
-
-  public type HomepageContent = {
-    heroText : Text;
-    tagline : Text;
-    aboutUs : Text;
-    learningMethods : Text;
-    studentConnection : Text;
-    schoolAddress : Text;
-    contactInfo : Text;
+  // ========== SCHOOL INFO ==========
+  public type SchoolInfo = {
+    schoolName : Text;
+    adminContactInfo : Text;
+    phoneNumber : Text;
+    emailAddress : Text;
+    address : Text;
+    principalName : Text;
+    facebookLink : Text;
+    twitterLink : Text;
+    instagramLink : Text;
+    website : Text;
   };
 
+  var schoolInfo : SchoolInfo = {
+    schoolName = "Indokidz School";
+    adminContactInfo = "";
+    phoneNumber = "+91-XXXXXXXXXX";
+    emailAddress = "indokidz@school.in";
+    address = "Teosa, Maharashtra, 444902";
+    principalName = "Default School Name";
+    facebookLink = "https://facebook.com/IndokidzSchool";
+    twitterLink = "https://twitter.com/IndokidzSchool";
+    instagramLink = "https://instagram.com/IndokidzSchool";
+    website = "https://www.indokidzschool.in";
+  };
+
+  public query func getSchoolInfo() : async SchoolInfo {
+    schoolInfo;
+  };
+
+  public shared ({ caller }) func updateSchoolInfo(
+    schoolName : Text,
+    adminContactInfo : Text,
+    phoneNumber : Text,
+    emailAddress : Text,
+    address : Text,
+    principalName : Text,
+    facebookLink : Text,
+    twitterLink : Text,
+    instagramLink : Text,
+    website : Text,
+  ) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admins can update school info");
+    };
+    schoolInfo := {
+      schoolName;
+      adminContactInfo;
+      phoneNumber;
+      emailAddress;
+      address;
+      principalName;
+      facebookLink;
+      twitterLink;
+      instagramLink;
+      website;
+    };
+  };
+
+  // ========== FEE CATEGORY ==========
   public type FeeCategory = {
-    title : Text;
+    id : Nat;
+    name : Text;
     amount : Nat;
   };
 
-  module FeeCategory {
-    public func compare(a : FeeCategory, b : FeeCategory) : Order.Order {
-      Text.compare(a.title, b.title);
+  let feeCategories = Map.empty<Nat, FeeCategory>();
+  var nextFeeCategoryId = 1;
+
+  public shared ({ caller }) func addFeeCategory(name : Text, amount : Nat) : async Nat {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can perform this action");
     };
+    let id = nextFeeCategoryId;
+    let category = { id; name; amount };
+    feeCategories.add(id, category);
+    nextFeeCategoryId += 1;
+    id;
   };
 
-  public type PaymentStatus = { #unpaid; #paid; #pending };
-
-  public type FeePaymentRecord = {
-    studentName : Text;
-    feeTitle : Text;
-    amount : Nat;
-    status : PaymentStatus;
-    recordId : Nat;
-  };
-
-  module FeePaymentRecord {
-    public func compare(a : FeePaymentRecord, b : FeePaymentRecord) : Order.Order {
-      switch (Text.compare(a.studentName, b.studentName)) {
-        case (#equal) { Nat.compare(a.recordId, b.recordId) };
-        case (other) { other };
+  public shared ({ caller }) func updateFeeCategory(id : Nat, name : Text, amount : Nat) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can perform this action");
+    };
+    switch (feeCategories.get(id)) {
+      case (null) { Runtime.trap("Fee category not found") };
+      case (?_) {
+        let updatedCategory = { id; name; amount };
+        feeCategories.add(id, updatedCategory);
       };
     };
   };
 
-  // ========== Persistent State ==========
-
-  var nextRecordId = 1;
-  var homepageContent : HomepageContent = {
-    heroText = "";
-    tagline = "";
-    aboutUs = "";
-    learningMethods = "";
-    studentConnection = "";
-    schoolAddress = "";
-    contactInfo = "Email: indokidz@school.in | Phone: +91-XXXXXXXXXX";
-  };
-
-  let feeCategories = Map.empty<Text, FeeCategory>();
-  let paymentRecords = Map.empty<Nat, FeePaymentRecord>();
-
-  // Internal state for actor owner
-  var owner : ?Principal = null;
-
-  // Check if owner has been set
-  public query func hasOwner() : async Bool {
-    owner != null;
-  };
-
-  // Validate if current caller is the owner
-  public query ({ caller }) func isOwner() : async Bool {
-    switch (owner) {
-      case (null) { false };
-      case (?principal) { principal == caller };
-    };
-  };
-
-  // Register current caller as an owner if and only if no owner has been registered
-  // Registering the owner must not override existing owners
-  public shared ({ caller }) func registerOwner() : async () {
-    switch (owner) {
-      case (null) {
-        owner := ?caller;
-      };
-      case (?principal) {
-        if (caller != principal) {
-          Runtime.trap("Owner already registered: This action can only be performed once.");
-        };
-      };
-    };
-  };
-
-  // ========== Admin-Only Functions ==========
-
-  // Edit homepage/site content
-  public shared ({ caller }) func updateHomepageContent(newContent : HomepageContent) : async () {
+  public shared ({ caller }) func deleteFeeCategory(id : Nat) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can perform this action");
     };
-    homepageContent := newContent;
-  };
-
-  // Add new fee category
-  public shared ({ caller }) func addFeeCategory(title : Text, amount : Nat) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can perform this action");
-    };
-    let category = { title; amount };
-    feeCategories.add(title, category);
-  };
-
-  // Update existing fee category
-  public shared ({ caller }) func updateFeeCategory(title : Text, amount : Nat) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can perform this action");
-    };
-    if (not feeCategories.containsKey(title)) {
+    if (not feeCategories.containsKey(id)) {
       Runtime.trap("Fee category not found");
     };
-    feeCategories.add(title, { title; amount });
+    feeCategories.remove(id);
   };
 
-  // Delete fee category
-  public shared ({ caller }) func deleteFeeCategory(title : Text) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can perform this action");
-    };
-    feeCategories.remove(title);
-  };
-
-  // View all fee payment records (admin only)
-  public query ({ caller }) func getAllPaymentRecords() : async [FeePaymentRecord] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can perform this action");
-    };
-    paymentRecords.values().toArray().sort();
-  };
-
-  // Update payment record status (admin only)
-  public shared ({ caller }) func updatePaymentStatus(recordId : Nat, status : PaymentStatus) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can perform this action");
-    };
-    switch (paymentRecords.get(recordId)) {
-      case (null) {
-        Runtime.trap("Payment record not found");
-      };
-      case (?record) {
-        let updatedRecord = {
-          record with
-          status
-        };
-        paymentRecords.add(recordId, updatedRecord);
-      };
-    };
-  };
-
-  // ========== PUBLIC (UNPROTECTED) FUNCTIONS ==========
-
-  // Get homepage/site content — publicly accessible, no auth required
-  public query func getHomepageContent() : async HomepageContent {
-    homepageContent;
-  };
-
-  // Get available fee categories — publicly accessible, no auth required
   public query func getFeeCategories() : async [FeeCategory] {
-    feeCategories.values().toArray().sort();
+    feeCategories.values().toArray();
   };
 
-  // Submit a fee payment record — publicly accessible, no auth required
-  public shared func submitFeePayment(studentName : Text, feeTitle : Text, amount : Nat) : async Nat {
-    let record = {
-      studentName;
-      feeTitle;
-      amount;
-      status = #unpaid;
-      recordId = nextRecordId;
+  // ========== GALLERY ==========
+  public type Photo = {
+    id : Nat;
+    url : Text; // could be base64 or a URL
+    caption : Text;
+  };
+
+  let photoStore = Map.empty<Nat, Photo>();
+  var nextPhotoId = 1;
+
+  public shared ({ caller }) func addPhoto(url : Text, caption : Text) : async Nat {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can add photos");
     };
-    paymentRecords.add(nextRecordId, record);
-    nextRecordId += 1;
-    record.recordId;
+    let id = nextPhotoId;
+    let photo = { id; url; caption };
+    photoStore.add(id, photo);
+    nextPhotoId += 1;
+    id;
   };
 
-  // Get specific payment record — publicly accessible, no auth required
-  public query func getPaymentRecord(recordId : Nat) : async FeePaymentRecord {
-    switch (paymentRecords.get(recordId)) {
-      case (null) { Runtime.trap("Payment record not found") };
-      case (?record) { record };
+  public shared ({ caller }) func deletePhoto(id : Nat) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can delete photos");
+    };
+    switch (photoStore.get(id)) {
+      case (null) { Runtime.trap("Photo not found") };
+      case (?_) { photoStore.remove(id) };
     };
   };
 
-  // Get all payment records for a student — publicly accessible, no auth required
-  public query func getStudentRecords(studentName : Text) : async [FeePaymentRecord] {
-    let iter = paymentRecords.values().filter(
-      func(record) { record.studentName == studentName }
-    );
-    iter.toArray().sort();
+  public query func getGallery() : async [Photo] {
+    photoStore.values().toArray();
+  };
+
+  // ========== HOME CONTENT ==========
+  public type HeroStats = {
+    studentsEnrolled : Nat;
+    yearsOfExcellence : Nat;
+    facultyCount : Nat;
+  };
+
+  public type SchoolHighlights = {
+    highlight1 : Text;
+    highlight2 : Text;
+    highlight3 : Text;
+    // Add more highlights as needed
+  };
+
+  public type Testimonial = {
+    name : Text;
+    designation : Text;
+    feedback : Text;
+  };
+
+  public type HomeHeroSection = {
+    schoolName : Text;
+    tagline : Text;
+    address : Text;
+    heroStats : HeroStats;
+    schoolHighlights : SchoolHighlights;
+    testimonials : [Testimonial];
+  };
+
+  var homeHeroSection : HomeHeroSection = {
+    schoolName = "INDO KIDZ";
+    tagline = "Where Little Minds Bloom into Big Dreams";
+    address = "Beside Nikhil Ashram, 495006, Bilaspur, Chhattisgarh";
+    heroStats = {
+      studentsEnrolled = 250;
+      yearsOfExcellence = 9;
+      facultyCount = 15;
+    };
+    schoolHighlights = {
+      highlight1 = "Spacious 3-acre campus in prime city location";
+      highlight2 = "Vast playground, digital classrooms, smart library";
+      highlight3 = "Highly qualified 1-to-15 teacher ratio";
+    };
+    testimonials = [
+      {
+        name = "Rakesh Sharma";
+        designation = "Parent";
+        feedback = "Excellent caring teachers, top city facilities, holistic child development.";
+      },
+      {
+        name = "Pooja Singh";
+        designation = "Parent";
+        feedback = "State-of-the-art technology aids in child growth and creativity.";
+      },
+      {
+        name = "Sunita Mishra";
+        designation = "Local Principal";
+        feedback = "Impressive focus on learning, critical thinking and individual development.";
+      },
+    ];
+  };
+
+  public query func getHomeHeroSection() : async HomeHeroSection {
+    homeHeroSection;
+  };
+
+  public shared ({ caller }) func updateHomeHeroSection(
+    schoolName : Text,
+    tagline : Text,
+    address : Text,
+    stats : HeroStats,
+    highlights : SchoolHighlights,
+    testimonials : [Testimonial],
+  ) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) { Runtime.trap("Unauthorized: Only admin can update hero section") };
+    homeHeroSection := {
+      schoolName;
+      tagline;
+      address;
+      heroStats = stats;
+      schoolHighlights = highlights;
+      testimonials;
+    };
+  };
+
+  // ========== ADMISSIONS CONTENT ==========
+  public type AdmissionsContent = {
+    eligibility : Text;
+    process : Text;
+    documents : Text;
+    applicationSteps : Text;
+    portalLink : Text;
+    faq : Text;
+  };
+
+  var admissionsContent : AdmissionsContent = {
+    eligibility = "";
+    process = "";
+    documents = "";
+    applicationSteps = "";
+    portalLink = "";
+    faq = "";
+  };
+
+  public query func getAdmissionsContent() : async AdmissionsContent {
+    admissionsContent;
+  };
+
+  public shared ({ caller }) func updateAdmissionsContent(
+    eligibility : Text,
+    process : Text,
+    documents : Text,
+    applicationSteps : Text,
+    portalLink : Text,
+    faq : Text,
+  ) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) { Runtime.trap("Unauthorized: Only admin can update content") };
+    admissionsContent := {
+      eligibility;
+      process;
+      documents;
+      applicationSteps;
+      portalLink;
+      faq;
+    };
+  };
+
+  // ========== ANNOUNCEMENTS ==========
+  public type Announcement = {
+    title : Text;
+    body : Text;
+    date : Text;
+  };
+
+  let announcementsStore = Map.empty<Nat, Announcement>();
+  var nextAnnouncementId = 1;
+
+  public shared ({ caller }) func addAnnouncement(title : Text, body : Text, date : Text) : async Nat {
+    if (not AccessControl.isAdmin(accessControlState, caller)) { Runtime.trap("Unauthorized: Only admin can add announcements") };
+    let id = nextAnnouncementId;
+    let announcement = { title; body; date };
+    announcementsStore.add(id, announcement);
+    nextAnnouncementId += 1;
+    id;
+  };
+
+  public query func getAnnouncement(id : Nat) : async Announcement {
+    switch (announcementsStore.get(id)) {
+      case (null) { Runtime.trap("Announcement not found") };
+      case (?announcement) { announcement };
+    };
+  };
+
+  public query func getAllAnnouncements() : async [Announcement] {
+    announcementsStore.values().toArray();
+  };
+
+  public shared ({ caller }) func updateAnnouncement(id : Nat, title : Text, body : Text, date : Text) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) { Runtime.trap("Unauthorized: Only admin can update announcements") };
+    switch (announcementsStore.get(id)) {
+      case (null) { Runtime.trap("Announcement not found") };
+      case (?_) {
+        let updatedAnnouncement = { title; body; date };
+        announcementsStore.add(id, updatedAnnouncement);
+      };
+    };
+  };
+
+  public shared ({ caller }) func deleteAnnouncement(id : Nat) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) { Runtime.trap("Unauthorized: Only admin can delete announcements") };
+    switch (announcementsStore.get(id)) {
+      case (null) { Runtime.trap("Announcement not found") };
+      case (?_) { announcementsStore.remove(id) };
+    };
+  };
+
+  // ========== THEME SETTINGS ==========
+  public type ThemeSettings = {
+    primaryColor : Text;
+    accentColor : Text;
+    fontChoice : Text;
+  };
+
+  var themeSettings : ThemeSettings = {
+    primaryColor = "#5eacd8";
+    accentColor = "#fcb900";
+    fontChoice = "Open Sans";
+  };
+
+  public query func getThemeSettings() : async ThemeSettings {
+    themeSettings;
+  };
+
+  public shared ({ caller }) func updateThemeSettings(
+    primaryColor : Text,
+    accentColor : Text,
+    fontChoice : Text,
+  ) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) { Runtime.trap("Unauthorized: Only admin can update theme") };
+    themeSettings := { primaryColor; accentColor; fontChoice };
   };
 };

@@ -1,58 +1,60 @@
 {
   "kind": "build_request",
-  "title": "Fix fees customization tab visibility (owner-only access enforcement)",
+  "title": "Fix Customize tab visibility after admin login",
+  "projectName": "INDO KIDZ",
   "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Ensure the 'Customize Site' button in the Navbar is only rendered for the authenticated owner. The current logic that conditionally shows the button must be audited and corrected so that no non-owner user ever sees it, regardless of authentication state. Do not change any other UI or logic.",
+      "text": "Fix the Customize tab (admin navigation button) in the Navbar so it becomes visible immediately after an admin user logs in with Internet Identity. The tab must reliably appear for admin users and remain hidden for non-admin or unauthenticated users.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-recent"
+          "msg-5",
+          "msg-6"
         ],
         "quotes": [
-          "solve the fees customization failure and change nothing else, the customization tab still visible to me"
+          "where is customize tab?",
+          "i am not able to see it still"
         ]
       },
       "acceptanceCriteria": [
-        "A user who is NOT the registered owner does not see the 'Customize Site' button in the Navbar after login.",
-        "The registered owner still sees and can access the 'Customize Site' button.",
-        "No other UI, routes, or backend logic is changed.",
-        "No runtime errors are introduced."
+        "When an admin user logs in via Internet Identity, the Customize tab appears in the navigation bar without requiring a page refresh.",
+        "When a non-admin authenticated user logs in, the Customize tab remains hidden.",
+        "When no user is logged in, the Customize tab is not visible.",
+        "The Customize tab links to the AdminPanel page (/admin or equivalent route).",
+        "Logging out hides the Customize tab immediately."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Ensure the Admin Panel page enforces owner-only access at the route/component level. If a non-owner navigates directly to the admin route, they must see the AccessDeniedScreen and must not be shown the Customize/Fee Category/Payment tabs. Do not change any other functionality.",
+      "text": "Ensure the admin status check in Navbar.tsx correctly reads from the useIsAdmin query (or equivalent hook in useQueries.ts) and that the query is invalidated and refetched after login so the Customize tab appears reactively. Debug and fix any stale-query or timing issue that prevents the admin flag from being truthy after authentication.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-recent"
+          "msg-5",
+          "msg-6"
         ],
         "quotes": [
-          "solve the fees customization failure and change nothing else, the customization tab still visible to me"
+          "i am not able to see it still"
         ]
       },
       "acceptanceCriteria": [
-        "Non-owner authenticated users who navigate directly to /admin are shown AccessDeniedScreen.",
-        "The 'Fees' customization tab inside the Admin Panel is not accessible to non-owners.",
-        "Owner retains full access to all admin tabs.",
-        "No other pages, components, or backend logic are affected."
+        "After a successful Internet Identity login, the admin status query is refetched automatically.",
+        "The Navbar re-renders with the Customize tab as soon as the admin status resolves to true.",
+        "No manual page refresh is needed for the tab to appear."
       ]
     }
   ],
   "constraints": [
-    "Do not change any backend logic, data models, or Motoko code.",
-    "Do not change any other frontend pages, components, or styling outside of the owner-access guard logic.",
-    "Do not introduce new dependencies.",
-    "Preserve all existing functionality for the owner role."
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts or frontend/src/hooks/useActor.ts.",
+    "Do not alter the backend admin authorization logic.",
+    "Preserve all existing navigation links and their routing."
   ],
   "nonGoals": [
-    "Redesigning the admin panel UI.",
-    "Adding new features or tabs.",
-    "Changing the fees payment flow for regular users.",
-    "Modifying homepage content or other pages."
+    "Adding new admin features or tabs.",
+    "Changing the visual design of the navigation bar.",
+    "Modifying the AdminPanel page content or tabs."
   ],
   "imageRequirements": {
     "required": [],

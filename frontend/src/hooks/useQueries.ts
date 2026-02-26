@@ -1,24 +1,35 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import { useInternetIdentity } from './useInternetIdentity';
-import type { UserProfile, PaymentStatus, HomepageContent } from '../backend';
-import { UserRole } from '../backend';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useActor } from "./useActor";
+import { useInternetIdentity } from "./useInternetIdentity";
+import type {
+  UserProfile,
+  SchoolInfo,
+  FeeCategory,
+  Photo,
+  HomeHeroSection,
+  HeroStats,
+  SchoolHighlights,
+  Testimonial,
+  AdmissionsContent,
+  Announcement,
+  ThemeSettings,
+} from "../backend";
 
 // ========== USER PROFILE ==========
-
 export function useGetCallerUserProfile() {
   const { actor, isFetching: actorFetching } = useActor();
+  const { identity } = useInternetIdentity();
+  const principalStr = identity?.getPrincipal().toString() ?? "anonymous";
 
   const query = useQuery<UserProfile | null>({
-    queryKey: ['currentUserProfile'],
+    queryKey: ["currentUserProfile", principalStr],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getCallerUserProfile();
     },
     enabled: !!actor && !actorFetching,
     retry: false,
   });
-
   return {
     ...query,
     isLoading: actorFetching || query.isLoading,
@@ -28,139 +39,89 @@ export function useGetCallerUserProfile() {
 
 export function useSaveCallerUserProfile() {
   const { actor } = useActor();
+  const { identity } = useInternetIdentity();
   const queryClient = useQueryClient();
+  const principalStr = identity?.getPrincipal().toString() ?? "anonymous";
 
   return useMutation({
     mutationFn: async (profile: UserProfile) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.saveCallerUserProfile(profile);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      queryClient.invalidateQueries({ queryKey: ["currentUserProfile", principalStr] });
     },
   });
 }
 
-// ========== OWNER ==========
-
-export function useHasOwner() {
+// ========== ADMIN ==========
+export function useIsAdmin() {
   const { actor, isFetching: actorFetching } = useActor();
+  const { identity } = useInternetIdentity();
+  // Include the principal in the query key so each user gets their own cache entry.
+  // This prevents the anonymous "false" result from being shown after login.
+  const principalStr = identity?.getPrincipal().toString() ?? "anonymous";
 
   return useQuery<boolean>({
-    queryKey: ['hasOwner'],
+    queryKey: ["isAdmin", principalStr],
     queryFn: async () => {
       if (!actor) return false;
-      return actor.hasOwner();
+      return actor.isCallerAdmin();
     },
     enabled: !!actor && !actorFetching,
-    staleTime: 0,
-    refetchOnMount: 'always',
-  });
-}
-
-export function useIsOwner() {
-  const { actor, isFetching: actorFetching } = useActor();
-  const { identity } = useInternetIdentity();
-
-  const query = useQuery<boolean>({
-    queryKey: ['isOwner', identity?.getPrincipal().toString()],
-    queryFn: async () => {
-      if (!actor) return false;
-      try {
-        return await actor.isOwner();
-      } catch {
-        return false;
-      }
-    },
-    enabled: !!actor && !actorFetching && !!identity,
     retry: false,
+    // Don't use stale data — always refetch when the actor/identity changes
     staleTime: 0,
-    refetchOnMount: 'always',
-  });
-
-  // Use isPending (not isLoading) so that a disabled/not-yet-run query is
-  // treated as "still loading" — prevents premature false negatives.
-  const queryPending = query.isPending;
-
-  return {
-    isOwner: query.data ?? false,
-    // Loading while: actor is initialising OR query hasn't resolved yet
-    isLoading: actorFetching || (!!identity && queryPending),
-    isFetched: !!actor && query.isFetched,
-  };
-}
-
-export function useRegisterOwner() {
-  const { actor } = useActor();
-  const { identity } = useInternetIdentity();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      // Step 1: register as owner
-      await actor.registerOwner();
-      // Step 2: grant the owner admin role so backend admin-gated operations work.
-      // _initializeAccessControlWithSecret is called at actor creation time; if it
-      // bootstrapped admin access the call below succeeds. If not, we try anyway
-      // and swallow the error so registration itself is not blocked.
-      if (identity) {
-        try {
-          await actor.assignCallerUserRole(identity.getPrincipal(), UserRole.admin);
-        } catch {
-          // Non-fatal: admin role assignment may already be handled by the
-          // access-control initialisation in useActor.ts.
-        }
-      }
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['hasOwner'] });
-      await queryClient.refetchQueries({ queryKey: ['hasOwner'] });
-      await queryClient.invalidateQueries({ queryKey: ['isOwner'] });
-      await queryClient.refetchQueries({ queryKey: ['isOwner'] });
-    },
   });
 }
 
-// ========== HOMEPAGE CONTENT ==========
+export const useIsOwner = useIsAdmin;
 
-export function useGetHomepageContent() {
+// ========== SCHOOL INFO ==========
+export function useGetSchoolInfo() {
   const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery({
-    queryKey: ['homepageContent'],
+  return useQuery<SchoolInfo>({
+    queryKey: ["schoolInfo"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getHomepageContent();
+      if (!actor) throw new Error("Actor not available");
+      return actor.getSchoolInfo();
     },
     enabled: !!actor && !actorFetching,
   });
 }
 
-export function useUpdateHomepageContent() {
+export function useUpdateSchoolInfo() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (content: HomepageContent) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.updateHomepageContent(content);
+    mutationFn: async (info: SchoolInfo) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.updateSchoolInfo(
+        info.schoolName,
+        info.adminContactInfo,
+        info.phoneNumber,
+        info.emailAddress,
+        info.address,
+        info.principalName,
+        info.facebookLink,
+        info.twitterLink,
+        info.instagramLink,
+        info.website
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['homepageContent'] });
+      queryClient.invalidateQueries({ queryKey: ["schoolInfo"] });
     },
   });
 }
 
 // ========== FEE CATEGORIES ==========
-
 export function useGetFeeCategories() {
   const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery({
-    queryKey: ['feeCategories'],
+  return useQuery<FeeCategory[]>({
+    queryKey: ["feeCategories"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getFeeCategories();
     },
     enabled: !!actor && !actorFetching,
@@ -170,14 +131,13 @@ export function useGetFeeCategories() {
 export function useAddFeeCategory() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async ({ title, amount }: { title: string; amount: bigint }) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.addFeeCategory(title, amount);
+    mutationFn: async ({ name, amount }: { name: string; amount: bigint }) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.addFeeCategory(name, amount);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['feeCategories'] });
+      queryClient.invalidateQueries({ queryKey: ["feeCategories"] });
     },
   });
 }
@@ -185,14 +145,13 @@ export function useAddFeeCategory() {
 export function useUpdateFeeCategory() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async ({ title, amount }: { title: string; amount: bigint }) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.updateFeeCategory(title, amount);
+    mutationFn: async ({ id, name, amount }: { id: bigint; name: string; amount: bigint }) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.updateFeeCategory(id, name, amount);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['feeCategories'] });
+      queryClient.invalidateQueries({ queryKey: ["feeCategories"] });
     },
   });
 }
@@ -200,64 +159,215 @@ export function useUpdateFeeCategory() {
 export function useDeleteFeeCategory() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (title: string) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.deleteFeeCategory(title);
+    mutationFn: async (id: bigint) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.deleteFeeCategory(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['feeCategories'] });
+      queryClient.invalidateQueries({ queryKey: ["feeCategories"] });
     },
   });
 }
 
-// ========== PAYMENT RECORDS ==========
-
-export function useGetAllPaymentRecords() {
+// ========== GALLERY ==========
+export function useGalleryPhotos() {
   const { actor, isFetching: actorFetching } = useActor();
-  const { identity } = useInternetIdentity();
-
-  return useQuery({
-    queryKey: ['allPaymentRecords'],
+  return useQuery<Photo[]>({
+    queryKey: ["gallery"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getAllPaymentRecords();
+      if (!actor) throw new Error("Actor not available");
+      return actor.getGallery();
     },
-    enabled: !!actor && !actorFetching && !!identity,
+    enabled: !!actor && !actorFetching,
   });
 }
 
-export function useUpdatePaymentStatus() {
+export function useAddPhoto() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async ({ recordId, status }: { recordId: bigint; status: PaymentStatus }) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.updatePaymentStatus(recordId, status);
+    mutationFn: async ({ url, caption }: { url: string; caption: string }) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.addPhoto(url, caption);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['allPaymentRecords'] });
+      queryClient.invalidateQueries({ queryKey: ["gallery"] });
     },
   });
 }
 
-export function useSubmitFeePayment() {
+export function useDeletePhoto() {
   const { actor } = useActor();
-
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      studentName,
-      feeTitle,
-      amount,
-    }: {
-      studentName: string;
-      feeTitle: string;
-      amount: bigint;
+    mutationFn: async (id: bigint) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.deletePhoto(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["gallery"] });
+    },
+  });
+}
+
+// ========== HOME HERO SECTION ==========
+export function useHomeHeroSection() {
+  const { actor, isFetching: actorFetching } = useActor();
+  return useQuery<HomeHeroSection>({
+    queryKey: ["homeHeroSection"],
+    queryFn: async () => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.getHomeHeroSection();
+    },
+    enabled: !!actor && !actorFetching,
+  });
+}
+
+export function useUpdateHomeHeroSection() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      schoolName: string;
+      tagline: string;
+      address: string;
+      stats: HeroStats;
+      highlights: SchoolHighlights;
+      testimonials: Testimonial[];
     }) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.submitFeePayment(studentName, feeTitle, amount);
+      if (!actor) throw new Error("Actor not available");
+      return actor.updateHomeHeroSection(
+        data.schoolName,
+        data.tagline,
+        data.address,
+        data.stats,
+        data.highlights,
+        data.testimonials
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["homeHeroSection"] });
+    },
+  });
+}
+
+// ========== ADMISSIONS CONTENT ==========
+export function useAdmissionsContent() {
+  const { actor, isFetching: actorFetching } = useActor();
+  return useQuery<AdmissionsContent>({
+    queryKey: ["admissionsContent"],
+    queryFn: async () => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.getAdmissionsContent();
+    },
+    enabled: !!actor && !actorFetching,
+  });
+}
+
+export function useUpdateAdmissionsContent() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (content: AdmissionsContent) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.updateAdmissionsContent(
+        content.eligibility,
+        content.process,
+        content.documents,
+        content.applicationSteps,
+        content.portalLink,
+        content.faq
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admissionsContent"] });
+    },
+  });
+}
+
+// ========== ANNOUNCEMENTS ==========
+export function useAnnouncements() {
+  const { actor, isFetching: actorFetching } = useActor();
+  return useQuery<Announcement[]>({
+    queryKey: ["announcements"],
+    queryFn: async () => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.getAllAnnouncements();
+    },
+    enabled: !!actor && !actorFetching,
+  });
+}
+
+export function useAddAnnouncement() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ title, body, date }: { title: string; body: string; date: string }) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.addAnnouncement(title, body, date);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["announcements"] });
+    },
+  });
+}
+
+export function useUpdateAnnouncement() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, title, body, date }: { id: bigint; title: string; body: string; date: string }) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.updateAnnouncement(id, title, body, date);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["announcements"] });
+    },
+  });
+}
+
+export function useDeleteAnnouncement() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: bigint) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.deleteAnnouncement(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["announcements"] });
+    },
+  });
+}
+
+// ========== THEME SETTINGS ==========
+export function useThemeSettings() {
+  const { actor, isFetching: actorFetching } = useActor();
+  return useQuery<ThemeSettings>({
+    queryKey: ["themeSettings"],
+    queryFn: async () => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.getThemeSettings();
+    },
+    enabled: !!actor && !actorFetching,
+  });
+}
+
+export function useUpdateThemeSettings() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (settings: ThemeSettings) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.updateThemeSettings(
+        settings.primaryColor,
+        settings.accentColor,
+        settings.fontChoice
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["themeSettings"] });
     },
   });
 }

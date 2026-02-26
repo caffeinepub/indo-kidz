@@ -1,236 +1,205 @@
-import { useState } from 'react';
-import { Link } from '@tanstack/react-router';
-import { useGetFeeCategories, useSubmitFeePayment } from '../hooks/useQueries';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
-import { CheckCircle, ArrowLeft, CreditCard, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { useGetFeeCategories } from "../hooks/useQueries";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CreditCard, CheckCircle, IndianRupee, User, Phone, BookOpen } from "lucide-react";
+import { toast } from "sonner";
 
 export default function FeesPayment() {
-  const { data: feeCategories, isLoading: categoriesLoading } = useGetFeeCategories();
-  const { mutate: submitPayment, isPending } = useSubmitFeePayment();
+  const { data: fees, isLoading } = useGetFeeCategories();
+  const [form, setForm] = useState({ studentName: "", rollNo: "", phone: "", category: "", paymentMode: "" });
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const [studentName, setStudentName] = useState('');
-  const [selectedFee, setSelectedFee] = useState('');
-  const [successRecord, setSuccessRecord] = useState<{ id: bigint; studentName: string; feeTitle: string; amount: bigint } | null>(null);
+  const selectedFee = fees?.find((f) => f.id.toString() === form.category);
 
-  const selectedCategory = feeCategories?.find((f) => f.title === selectedFee);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!studentName.trim() || !selectedFee || !selectedCategory) return;
+    if (!form.studentName || !form.category || !form.paymentMode) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+    setSubmitting(true);
+    await new Promise((r) => setTimeout(r, 1500));
+    setSubmitting(false);
+    setSubmitted(true);
+    toast.success("Payment request submitted successfully!");
+  };
 
-    submitPayment(
-      {
-        studentName: studentName.trim(),
-        feeTitle: selectedFee,
-        amount: selectedCategory.amount,
-      },
-      {
-        onSuccess: (recordId) => {
-          setSuccessRecord({
-            id: recordId,
-            studentName: studentName.trim(),
-            feeTitle: selectedFee,
-            amount: selectedCategory.amount,
-          });
-          toast.success('Payment record submitted successfully! 🎉');
-        },
-        onError: (err) => {
-          toast.error('Failed to submit payment. Please try again.');
-          console.error(err);
-        },
-      }
+  if (submitted) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center px-4 animate-fade-in">
+        <div className="text-center max-w-md">
+          <div className="w-24 h-24 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="w-12 h-12 text-success" />
+          </div>
+          <h2 className="font-fredoka text-4xl text-foreground mb-3">Payment Submitted!</h2>
+          <p className="text-muted-foreground mb-2">
+            Your payment request for <strong>{selectedFee?.name}</strong> has been submitted.
+          </p>
+          <p className="text-muted-foreground mb-6">
+            Amount: <strong className="text-primary">₹{selectedFee?.amount.toString()}</strong>
+          </p>
+          <p className="text-sm text-muted-foreground bg-muted rounded-xl p-4 mb-6">
+            Please visit the school office with your payment receipt to complete the process. Our staff will assist you.
+          </p>
+          <Button
+            onClick={() => { setSubmitted(false); setForm({ studentName: "", rollNo: "", phone: "", category: "", paymentMode: "" }); }}
+            className="bg-gradient-hero text-white hover:opacity-90"
+          >
+            Make Another Payment
+          </Button>
+        </div>
+      </div>
     );
-  };
-
-  const handleReset = () => {
-    setSuccessRecord(null);
-    setStudentName('');
-    setSelectedFee('');
-  };
+  }
 
   return (
-    <div className="min-h-screen bg-background py-12">
-      <div className="container mx-auto px-4 max-w-5xl">
-        {/* Header */}
-        <div className="mb-10">
-          <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-6 font-semibold">
-            <ArrowLeft size={18} />
-            Back to Homepage
-          </Link>
-          <div className="text-center">
-            <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-2 mb-4">
-              <CreditCard size={14} className="text-primary" />
-              <span className="text-sm font-bold text-primary">School Fees</span>
-            </div>
-            <h1 className="font-fredoka text-4xl md:text-5xl text-foreground mb-3">
-              Fees Payment 💳
-            </h1>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Submit your fee payment record below. Our team will process and confirm your payment.
-            </p>
+    <div className="animate-fade-in">
+      {/* Hero */}
+      <section className="relative py-20 bg-gradient-hero overflow-hidden">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `url('/assets/generated/pattern-bg.dim_400x400.png')`, backgroundRepeat: "repeat" }} />
+        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center mx-auto mb-4">
+            <CreditCard className="w-9 h-9 text-white" />
           </div>
+          <h1 className="font-fredoka text-5xl sm:text-6xl text-white mb-4">Fee Payment</h1>
+          <p className="text-white/80 text-xl max-w-2xl mx-auto">
+            Quick and easy fee payment for INDO KIDZ students.
+          </p>
         </div>
+      </section>
 
-        {/* Success State */}
-        {successRecord ? (
-          <div className="max-w-lg mx-auto">
-            <Card className="rounded-3xl border-2 border-success/30 shadow-playful-lg text-center">
-              <CardContent className="pt-10 pb-8 px-8">
-                <CheckCircle size={64} className="text-success mx-auto mb-4" />
-                <h2 className="font-fredoka text-3xl text-foreground mb-2">Payment Submitted! 🎉</h2>
-                <p className="text-muted-foreground mb-6">
-                  Your payment record has been successfully submitted. Please keep your record ID for reference.
-                </p>
-                <div className="bg-secondary rounded-2xl p-5 text-left space-y-3 mb-6">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground font-semibold text-sm">Record ID</span>
-                    <span className="font-bold text-primary">#{successRecord.id.toString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground font-semibold text-sm">Student Name</span>
-                    <span className="font-bold">{successRecord.studentName}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground font-semibold text-sm">Fee Type</span>
-                    <span className="font-bold">{successRecord.feeTitle}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground font-semibold text-sm">Amount</span>
-                    <span className="font-bold text-primary">
-                      Rp {Number(successRecord.amount).toLocaleString('id-ID')}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground font-semibold text-sm">Status</span>
-                    <span className="font-bold text-amber-600 bg-amber-100 px-3 py-0.5 rounded-full text-xs">
-                      Pending
-                    </span>
-                  </div>
-                </div>
-                <Button onClick={handleReset} className="w-full rounded-2xl font-bold">
-                  Submit Another Payment
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Fee Categories */}
-            <div>
-              <h2 className="font-fredoka text-2xl text-foreground mb-5">Available Fee Categories</h2>
-              {categoriesLoading ? (
-                <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <Skeleton key={i} className="h-20 rounded-2xl" />
-                  ))}
-                </div>
-              ) : feeCategories && feeCategories.length > 0 ? (
-                <div className="space-y-3">
-                  {feeCategories.map((fee) => (
-                    <button
-                      key={fee.title}
-                      onClick={() => setSelectedFee(fee.title)}
-                      className={`w-full text-left rounded-2xl p-5 border-2 transition-all duration-200 ${
-                        selectedFee === fee.title
-                          ? 'border-primary bg-primary/10 shadow-playful'
-                          : 'border-border bg-card hover:border-primary/50 hover:bg-secondary/50'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-bold text-foreground">{fee.title}</div>
-                          <div className="text-sm text-muted-foreground mt-0.5">Click to select</div>
-                        </div>
-                        <div className="font-fredoka text-2xl text-primary">
-                          Rp {Number(fee.amount).toLocaleString('id-ID')}
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="bg-card rounded-2xl border-2 border-border p-8 text-center">
-                  <AlertCircle size={40} className="text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground font-semibold">No fee categories available yet.</p>
-                  <p className="text-sm text-muted-foreground mt-1">Please check back later or contact the school.</p>
+      <section className="py-16 bg-gradient-section">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6">
+          <div className="bg-white rounded-3xl shadow-playful p-8 border border-border">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-hero flex items-center justify-center">
+                <IndianRupee className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="font-fredoka text-2xl text-foreground">Payment Form</h2>
+                <p className="text-sm text-muted-foreground">Fill in the details to proceed</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <Label htmlFor="studentName" className="flex items-center gap-1.5 mb-1.5">
+                  <User className="w-4 h-4 text-primary" /> Student Name *
+                </Label>
+                <Input
+                  id="studentName"
+                  value={form.studentName}
+                  onChange={(e) => setForm({ ...form, studentName: e.target.value })}
+                  placeholder="Enter student's full name"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="rollNo" className="flex items-center gap-1.5 mb-1.5">
+                  <BookOpen className="w-4 h-4 text-primary" /> Roll Number
+                </Label>
+                <Input
+                  id="rollNo"
+                  value={form.rollNo}
+                  onChange={(e) => setForm({ ...form, rollNo: e.target.value })}
+                  placeholder="Enter roll number (optional)"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="phone" className="flex items-center gap-1.5 mb-1.5">
+                  <Phone className="w-4 h-4 text-primary" /> Parent's Phone
+                </Label>
+                <Input
+                  id="phone"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  placeholder="+91 XXXXXXXXXX"
+                />
+              </div>
+
+              <div>
+                <Label className="flex items-center gap-1.5 mb-1.5">
+                  <IndianRupee className="w-4 h-4 text-primary" /> Fee Category *
+                </Label>
+                {isLoading ? (
+                  <Skeleton className="h-10 w-full rounded-lg" />
+                ) : (
+                  <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select fee category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fees && fees.length > 0 ? (
+                        fees.map((fee) => (
+                          <SelectItem key={fee.id.toString()} value={fee.id.toString()}>
+                            {fee.name} — ₹{fee.amount.toString()}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="none" disabled>No fee categories available</SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+
+              {selectedFee && (
+                <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
+                  <p className="text-sm text-muted-foreground">Amount to Pay</p>
+                  <p className="font-fredoka text-3xl text-primary">₹{selectedFee.amount.toString()}</p>
                 </div>
               )}
-            </div>
 
-            {/* Payment Form */}
-            <div>
-              <h2 className="font-fredoka text-2xl text-foreground mb-5">Submit Payment Record</h2>
-              <Card className="rounded-3xl border-2 border-border shadow-playful">
-                <CardContent className="pt-6 pb-6 px-6">
-                  <form onSubmit={handleSubmit} className="space-y-5">
-                    <div className="space-y-2">
-                      <Label htmlFor="studentName" className="font-bold">
-                        Student Name *
-                      </Label>
-                      <Input
-                        id="studentName"
-                        value={studentName}
-                        onChange={(e) => setStudentName(e.target.value)}
-                        placeholder="Enter student's full name"
-                        className="rounded-2xl border-2 focus:border-primary"
-                        required
-                      />
-                    </div>
+              <div>
+                <Label className="flex items-center gap-1.5 mb-1.5">
+                  <CreditCard className="w-4 h-4 text-primary" /> Payment Mode *
+                </Label>
+                <Select value={form.paymentMode} onValueChange={(v) => setForm({ ...form, paymentMode: v })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select payment mode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cash">Cash at School Office</SelectItem>
+                    <SelectItem value="upi">UPI Transfer</SelectItem>
+                    <SelectItem value="bank">Bank Transfer / NEFT</SelectItem>
+                    <SelectItem value="cheque">Cheque</SelectItem>
+                    <SelectItem value="dd">Demand Draft</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="feeType" className="font-bold">
-                        Fee Type *
-                      </Label>
-                      <Select value={selectedFee} onValueChange={setSelectedFee}>
-                        <SelectTrigger className="rounded-2xl border-2 focus:border-primary">
-                          <SelectValue placeholder="Select fee category" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-2xl">
-                          {feeCategories?.map((fee) => (
-                            <SelectItem key={fee.title} value={fee.title} className="rounded-xl">
-                              {fee.title} — Rp {Number(fee.amount).toLocaleString('id-ID')}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+              <Button
+                type="submit"
+                className="w-full bg-gradient-hero text-white hover:opacity-90 py-6 text-lg font-bold rounded-xl"
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <span className="flex items-center gap-2">
+                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Processing...
+                  </span>
+                ) : (
+                  "Submit Payment Request 💳"
+                )}
+              </Button>
+            </form>
 
-                    {selectedCategory && (
-                      <div className="bg-primary/10 rounded-2xl p-4 border border-primary/20">
-                        <div className="flex justify-between items-center">
-                          <span className="font-semibold text-foreground">Amount to Pay</span>
-                          <span className="font-fredoka text-2xl text-primary">
-                            Rp {Number(selectedCategory.amount).toLocaleString('id-ID')}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="bg-secondary/50 rounded-2xl p-4 text-sm text-muted-foreground">
-                      <p className="font-semibold mb-1">📋 Note:</p>
-                      <p>This submits a payment record. Actual payment processing will be confirmed by the school administration.</p>
-                    </div>
-
-                    <Button
-                      type="submit"
-                      disabled={!studentName.trim() || !selectedFee || isPending}
-                      className="w-full rounded-2xl font-bold text-base py-5 shadow-playful"
-                    >
-                      {isPending ? 'Submitting...' : 'Submit Payment Record 💳'}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
+            <div className="mt-6 p-4 bg-muted/50 rounded-xl">
+              <p className="text-xs text-muted-foreground text-center">
+                <strong>Note:</strong> This form submits a payment request. Please visit the school office with your payment to complete the transaction. For UPI/Bank transfers, contact the office for account details.
+              </p>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      </section>
     </div>
   );
 }

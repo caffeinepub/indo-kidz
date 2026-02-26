@@ -1,39 +1,44 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix fees customization tab visibility (owner-only access enforcement)",
+  "title": "Fix Customize tab visibility after admin login",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Ensure the 'Customize Site' button in the Navbar is only rendered for the authenticated owner",
+      "summary": "Fix the Customize tab in Navbar to appear immediately after admin login via Internet Identity without requiring page refresh",
       "acceptanceCriteria": [
-        "A user who is NOT the registered owner does not see the 'Customize Site' button in the Navbar after login.",
-        "The registered owner still sees and can access the 'Customize Site' button.",
-        "No other UI, routes, or backend logic is changed.",
-        "No runtime errors are introduced."
+        "When an admin user logs in via Internet Identity, the Customize tab appears in the navigation bar without requiring a page refresh.",
+        "When a non-admin authenticated user logs in, the Customize tab remains hidden.",
+        "When no user is logged in, the Customize tab is not visible.",
+        "The Customize tab links to the AdminPanel page (/admin or equivalent route).",
+        "Logging out hides the Customize tab immediately."
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/Navbar.tsx",
           "operation": "modify",
-          "description": "Audit and correct the conditional rendering logic for the 'Customize Site' button to ensure it only appears when the authenticated user is the registered owner. Review the current isOwner check implementation and fix any logic gaps that allow non-owners to see the button. Verify that the button is hidden for all non-owner users regardless of their authentication state or role."
+          "description": "Review and fix the admin status check logic to ensure the Customize tab becomes visible immediately after login. Verify that the useIsAdmin hook is called correctly and that the component re-renders when the admin status query resolves. Ensure the tab visibility logic correctly evaluates both authentication and admin status, and that logout properly hides the tab."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Ensure the Admin Panel page enforces owner-only access at the route/component level",
+      "summary": "Ensure admin status query is refetched after login and Navbar re-renders reactively when admin status becomes true",
       "acceptanceCriteria": [
-        "Non-owner authenticated users who navigate directly to /admin are shown AccessDeniedScreen.",
-        "The 'Fees' customization tab inside the Admin Panel is not accessible to non-owners.",
-        "Owner retains full access to all admin tabs.",
-        "No other pages, components, or backend logic are affected."
+        "After a successful Internet Identity login, the admin status query is refetched automatically.",
+        "The Navbar re-renders with the Customize tab as soon as the admin status resolves to true.",
+        "No manual page refresh is needed for the tab to appear."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/AdminPanel.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add owner-only access enforcement at the component level. When the component renders, check if the authenticated user is the owner using the isOwner query. If the user is not the owner, render the AccessDeniedScreen component instead of the admin tabs (Content, Fee Categories, Payment Records). Ensure the isOwner check is complete before rendering any admin functionality to prevent non-owners from seeing or accessing the customization tabs."
+          "description": "Review the useIsAdmin query hook implementation to ensure it properly depends on the actor availability and refetches when authentication state changes. Verify the query is enabled only when the actor is ready and that it correctly invalidates on login/logout events. Fix any stale query or timing issues that prevent the admin flag from becoming truthy after authentication."
+        },
+        {
+          "path": "frontend/src/components/Navbar.tsx",
+          "operation": "modify",
+          "description": "Ensure the Navbar component correctly subscribes to both authentication state and admin query results. Add query invalidation trigger after successful login if needed to force immediate refetch of admin status. Verify the component properly handles loading states and re-renders when either authentication or admin status changes."
         }
       ]
     }
