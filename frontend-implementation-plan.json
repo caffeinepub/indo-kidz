@@ -1,24 +1,6 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Display principal ID for logged-in Internet Identity user",
-  "requirements": [
-    {
-      "id": "REQ-1",
-      "summary": "Display the currently logged-in user's Internet Identity principal ID visibly on the page (e.g., in the Navbar or as a dismissible banner) whenever the user is authenticated, so the admin can easily copy and share their principal ID.",
-      "acceptanceCriteria": [
-        "When a user is logged in via Internet Identity, their principal ID string is displayed on screen in a readable, copyable format.",
-        "The principal ID display is only shown when the user is authenticated (not shown to logged-out visitors).",
-        "The displayed principal ID matches the format of a valid ICP principal (e.g., xxxxx-xxxxx-xxxxx-xxxxx-xxx).",
-        "The principal ID text can be easily copied (e.g., via a copy-to-clipboard button or selectable text)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/Navbar.tsx",
-          "operation": "modify",
-          "description": "Add a principal ID display component to the Navbar that shows the authenticated user's principal ID with a copy-to-clipboard button. The component should only render when the user is authenticated (identity is not null). Use the existing useInternetIdentity hook to access the identity and call identity.getPrincipal().toString() to retrieve the principal ID string. Position the principal ID display visibly in the Navbar (e.g., between navigation links and login button). Include a copy button using a clipboard icon from lucide-react that copies the principal ID to clipboard and shows a toast notification on success."
-        }
-      ]
-    }
-  ]
+  "title": "Set hardcoded admin principal ID in backend",
+  "requirements": []
 }

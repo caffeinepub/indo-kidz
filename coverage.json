@@ -1,34 +1,33 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T12:58:27.415Z",
+  "generatedAt": "2026-03-01T04:15:09.123Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
     "total": 1,
-    "implemented": 1,
+    "implemented": 0,
     "items": [
       {
-        "id": "REQ-1",
-        "summary": "Display the currently logged-in user's Internet Identity principal ID visibly on the page (e.g., in the Navbar or as a dismissible banner) whenever the user is authenticated, so the admin ('Akshit raj') can easily copy and share their principal ID.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/Navbar.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/Navbar.tsx"
-        ]
+        "id": "REQ-2",
+        "summary": "Set the principal ID '25vbj-lny5e-uxjij-gyv6b-tshsm-glbla-mta6g-knjdg-7lo2f-hztzh-pae' as a hardcoded or seeded admin in the backend access control system so that this principal is recognized as an admin when the application checks for admin privileges.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
-    "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/Navbar.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

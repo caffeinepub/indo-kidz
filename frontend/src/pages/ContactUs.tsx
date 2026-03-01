@@ -1,6 +1,6 @@
-import { useGetSchoolInfo } from "../hooks/useQueries";
+import { useGetSchoolInfo, useSubmitContactMessage } from "../hooks/useQueries";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MapPin, Phone, Mail, Globe, User, Facebook, Instagram, Twitter } from "lucide-react";
+import { MapPin, Phone, Mail, Globe, User } from "lucide-react";
 import { SiFacebook, SiInstagram, SiX } from "react-icons/si";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -9,18 +9,29 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
+const emptyForm = { name: "", email: "", phone: "", subject: "", message: "" };
+
 export default function ContactUs() {
   const { data: info, isLoading } = useGetSchoolInfo();
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [sending, setSending] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+  const submitMessage = useSubmitContactMessage();
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSending(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setSending(false);
-    toast.success("Message sent! We'll get back to you soon. 📬");
-    setForm({ name: "", email: "", message: "" });
+    try {
+      await submitMessage.mutateAsync({
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        subject: form.subject,
+        message: form.message,
+        timestamp: BigInt(Date.now()),
+      });
+      toast.success("Message sent! We'll get back to you soon. 📬");
+      setForm(emptyForm);
+    } catch {
+      toast.error("Failed to send message. Please try again.");
+    }
   };
 
   const defaultInfo = {
@@ -144,6 +155,27 @@ export default function ContactUs() {
                   />
                 </div>
                 <div>
+                  <Label htmlFor="cphone">Phone Number</Label>
+                  <Input
+                    id="cphone"
+                    type="tel"
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    placeholder="+91-XXXXXXXXXX"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="csubject">Subject</Label>
+                  <Input
+                    id="csubject"
+                    value={form.subject}
+                    onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                    placeholder="What is this about?"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
                   <Label htmlFor="cmessage">Message</Label>
                   <Textarea
                     id="cmessage"
@@ -157,9 +189,9 @@ export default function ContactUs() {
                 <Button
                   type="submit"
                   className="w-full bg-gradient-hero text-white hover:opacity-90 py-5 text-base font-bold rounded-xl"
-                  disabled={sending}
+                  disabled={submitMessage.isPending}
                 >
-                  {sending ? (
+                  {submitMessage.isPending ? (
                     <span className="flex items-center gap-2">
                       <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       Sending...

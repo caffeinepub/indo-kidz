@@ -13,6 +13,7 @@ import type {
   AdmissionsContent,
   Announcement,
   ThemeSettings,
+  ContactMessage,
 } from "../backend";
 
 // ========== USER PROFILE ==========
@@ -58,8 +59,6 @@ export function useSaveCallerUserProfile() {
 export function useIsAdmin() {
   const { actor, isFetching: actorFetching } = useActor();
   const { identity } = useInternetIdentity();
-  // Include the principal in the query key so each user gets their own cache entry.
-  // This prevents the anonymous "false" result from being shown after login.
   const principalStr = identity?.getPrincipal().toString() ?? "anonymous";
 
   return useQuery<boolean>({
@@ -70,7 +69,6 @@ export function useIsAdmin() {
     },
     enabled: !!actor && !actorFetching,
     retry: false,
-    // Don't use stale data — always refetch when the actor/identity changes
     staleTime: 0,
   });
 }
@@ -368,6 +366,47 @@ export function useUpdateThemeSettings() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["themeSettings"] });
+    },
+  });
+}
+
+// ========== CONTACT MESSAGES ==========
+export function useContactMessages() {
+  const { actor, isFetching: actorFetching } = useActor();
+  return useQuery<ContactMessage[]>({
+    queryKey: ["contactMessages"],
+    queryFn: async () => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.getContactMessages();
+    },
+    enabled: !!actor && !actorFetching,
+  });
+}
+
+export function useSubmitContactMessage() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      name: string;
+      email: string;
+      phone: string;
+      subject: string;
+      message: string;
+      timestamp: bigint;
+    }) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.submitContactMessage(
+        data.name,
+        data.email,
+        data.phone,
+        data.subject,
+        data.message,
+        data.timestamp
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contactMessages"] });
     },
   });
 }

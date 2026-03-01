@@ -1,24 +1,4 @@
 {
   "kind": "feature_evidence_report",
-  "features": [
-    {
-      "featureId": "feature-display-the-currently-logged-in-user-s-internet-identity-principal-id-visibly-on-the-page-e-g-in-the-navbar-or-as-a-dismissible-banner-whenever-the-user-is-authenticated-so-the-admin-akshit-raj-can-easily-copy-and-share-their-principal-id",
-      "featureTitle": "Display the currently logged-in user's Internet Identity principal ID visibly on the page (e.g., in the Navbar or as a dismissible banner) whenever the user is authenticated, so the admin ('Akshit raj') can easily copy and share their principal ID.",
-      "files": [
-        "frontend/src/components/Navbar.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-1"
-      ],
-      "confidence": "high"
-    }
-  ]
+  "features": []
 }

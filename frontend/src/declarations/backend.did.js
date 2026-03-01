@@ -30,6 +30,15 @@ export const UserProfile = IDL.Record({
   'contactInfo' : IDL.Text,
   'name' : IDL.Text,
 });
+export const ContactMessage = IDL.Record({
+  'id' : IDL.Nat,
+  'subject' : IDL.Text,
+  'name' : IDL.Text,
+  'email' : IDL.Text,
+  'message' : IDL.Text,
+  'timestamp' : IDL.Nat,
+  'phone' : IDL.Text,
+});
 export const FeeCategory = IDL.Record({
   'id' : IDL.Nat,
   'name' : IDL.Text,
@@ -95,6 +104,7 @@ export const idlService = IDL.Service({
   'getAnnouncement' : IDL.Func([IDL.Nat], [Announcement], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getContactMessages' : IDL.Func([], [IDL.Vec(ContactMessage)], ['query']),
   'getFeeCategories' : IDL.Func([], [IDL.Vec(FeeCategory)], ['query']),
   'getGallery' : IDL.Func([], [IDL.Vec(Photo)], ['query']),
   'getHomeHeroSection' : IDL.Func([], [HomeHeroSection], ['query']),
@@ -107,6 +117,11 @@ export const idlService = IDL.Service({
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'submitContactMessage' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Nat],
+      [],
+      [],
+    ),
   'updateAdmissionsContent' : IDL.Func(
       [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
       [],
@@ -174,6 +189,15 @@ export const idlFactory = ({ IDL }) => {
     'contactInfo' : IDL.Text,
     'name' : IDL.Text,
   });
+  const ContactMessage = IDL.Record({
+    'id' : IDL.Nat,
+    'subject' : IDL.Text,
+    'name' : IDL.Text,
+    'email' : IDL.Text,
+    'message' : IDL.Text,
+    'timestamp' : IDL.Nat,
+    'phone' : IDL.Text,
+  });
   const FeeCategory = IDL.Record({
     'id' : IDL.Nat,
     'name' : IDL.Text,
@@ -239,6 +263,7 @@ export const idlFactory = ({ IDL }) => {
     'getAnnouncement' : IDL.Func([IDL.Nat], [Announcement], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getContactMessages' : IDL.Func([], [IDL.Vec(ContactMessage)], ['query']),
     'getFeeCategories' : IDL.Func([], [IDL.Vec(FeeCategory)], ['query']),
     'getGallery' : IDL.Func([], [IDL.Vec(Photo)], ['query']),
     'getHomeHeroSection' : IDL.Func([], [HomeHeroSection], ['query']),
@@ -251,6 +276,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'submitContactMessage' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Nat],
+        [],
+        [],
+      ),
     'updateAdmissionsContent' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
         [],

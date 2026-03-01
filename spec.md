@@ -1,11 +1,9 @@
 # Specification
 
 ## Summary
-**Goal:** Display the logged-in Internet Identity user's principal ID on screen so it can be easily read and copied.
+**Goal:** Hardcode a specific principal ID as an admin in the backend access control system.
 
 **Planned changes:**
-- When a user is authenticated via Internet Identity, show their principal ID in the Navbar (or as a dismissible banner)
-- Add a copy-to-clipboard button next to the principal ID for easy copying
-- Hide the principal ID display entirely when no user is logged in
+- Add the principal ID `25vbj-lny5e-uxjij-gyv6b-tshsm-glbla-mta6g-knjdg-7lo2f-hztzh-pae` as a hardcoded/seeded admin in the backend `isAdmin` (or equivalent) check in `backend/main.mo`.
 
-**User-visible outcome:** After logging in, the user can see their ICP principal ID displayed prominently and copy it with a single click.
+**User-visible outcome:** The specified principal is recognized as an admin by the backend, granting it admin privileges without breaking any existing admin logic.

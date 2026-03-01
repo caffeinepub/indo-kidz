@@ -1,35 +1,31 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "App with Internet Identity authentication and admin role management. User 'Akshit raj' needs to be set as admin for the Customize tab. Currently adding a principal ID display feature to identify the admin principal.",
+  "summary": "Project involves an admin panel with a fee payment tab and customize panel. User has provided a principal ID to be set as an admin.",
   "architectural_notes": [
-    "Uses Internet Identity for authentication; admin role is determined by hardcoded principal ID",
-    "Customize tab should only be visible to the admin user"
+    "Admin principal ID: 25vbj-lny5e-uxjij-gyv6b-tshsm-glbla-mta6g-knjdg-7lo2f-hztzh-pae"
   ],
-  "known_issues": [
-    "Admin principal ID not yet set — Customize tab not visible to intended admin ('Akshit raj')"
-  ],
+  "known_issues": [],
   "isFixRequest": false,
-  "existing_features": [
-    {
-      "id": "feature-display-the-currently-logged-in-user-s-internet-identity-principal-id-visibly-on-the-page-e-g-in-the-navbar-or-as-a-dismissible-banner-whenever-the-user-is-authenticated-so-the-admin-akshit-raj-can-easily-copy-and-share-their-principal-id",
-      "title": "Display the currently logged-in user's Internet Identity principal ID visibly on the page (e.g., in the Navbar or as a dismissible banner) whenever the user is authenticated, so the admin ('Akshit raj') can easily copy and share their principal ID.",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "version": 1
-    }
-  ],
+  "existing_features": [],
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Display principal ID for logged-in Internet Identity user so admin can be identified",
+      "summary": "Set provided principal ID as admin in the application",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Set the principal ID '25vbj-lny5e-uxjij-gyv6b-tshsm-glbla-mta6g-knjdg-7lo2f-hztzh-pae' as a hardcoded or seeded admin in the backend access control system so that this principal is recognized as an admin when the application checks for admin privileges.",
+      "reqIds": [
+        "REQ-2"
+      ],
       "status": "pending"
     }
   ],
   "gameProjectType": "none",
-  "projectName": "INDO KIDZ",
+  "projectName": "Indo Kidz",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

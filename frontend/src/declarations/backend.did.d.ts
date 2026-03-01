@@ -23,6 +23,15 @@ export interface Announcement {
   'body' : string,
   'date' : string,
 }
+export interface ContactMessage {
+  'id' : bigint,
+  'subject' : string,
+  'name' : string,
+  'email' : string,
+  'message' : string,
+  'timestamp' : bigint,
+  'phone' : string,
+}
 export interface FeeCategory {
   'id' : bigint,
   'name' : string,
@@ -87,6 +96,7 @@ export interface _SERVICE {
   'getAnnouncement' : ActorMethod<[bigint], Announcement>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getContactMessages' : ActorMethod<[], Array<ContactMessage>>,
   'getFeeCategories' : ActorMethod<[], Array<FeeCategory>>,
   'getGallery' : ActorMethod<[], Array<Photo>>,
   'getHomeHeroSection' : ActorMethod<[], HomeHeroSection>,
@@ -95,6 +105,10 @@ export interface _SERVICE {
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'submitContactMessage' : ActorMethod<
+    [string, string, string, string, string, bigint],
+    undefined
+  >,
   'updateAdmissionsContent' : ActorMethod<
     [string, string, string, string, string, string],
     undefined

@@ -94,6 +94,15 @@ export interface Testimonial {
     designation: string;
     feedback: string;
 }
+export interface ContactMessage {
+    id: bigint;
+    subject: string;
+    name: string;
+    email: string;
+    message: string;
+    timestamp: bigint;
+    phone: string;
+}
 export interface SchoolInfo {
     instagramLink: string;
     twitterLink: string;
@@ -175,6 +184,7 @@ export interface backendInterface {
     getAnnouncement(id: bigint): Promise<Announcement>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getContactMessages(): Promise<Array<ContactMessage>>;
     getFeeCategories(): Promise<Array<FeeCategory>>;
     getGallery(): Promise<Array<Photo>>;
     getHomeHeroSection(): Promise<HomeHeroSection>;
@@ -183,6 +193,7 @@ export interface backendInterface {
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    submitContactMessage(name: string, email: string, phone: string, subject: string, message: string, timestamp: bigint): Promise<void>;
     updateAdmissionsContent(eligibility: string, process: string, documents: string, applicationSteps: string, portalLink: string, faq: string): Promise<void>;
     updateAnnouncement(id: bigint, title: string, body: string, date: string): Promise<void>;
     updateFeeCategory(id: bigint, name: string, amount: bigint): Promise<void>;
@@ -375,6 +386,20 @@ export class Backend implements backendInterface {
             return from_candid_UserRole_n4(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getContactMessages(): Promise<Array<ContactMessage>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getContactMessages();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getContactMessages();
+            return result;
+        }
+    }
     async getFeeCategories(): Promise<Array<FeeCategory>> {
         if (this.processError) {
             try {
@@ -484,6 +509,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.saveCallerUserProfile(arg0);
+            return result;
+        }
+    }
+    async submitContactMessage(arg0: string, arg1: string, arg2: string, arg3: string, arg4: string, arg5: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.submitContactMessage(arg0, arg1, arg2, arg3, arg4, arg5);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.submitContactMessage(arg0, arg1, arg2, arg3, arg4, arg5);
             return result;
         }
     }

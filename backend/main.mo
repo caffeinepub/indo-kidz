@@ -1,15 +1,13 @@
-import Map "mo:core/Map";
-import Nat "mo:core/Nat";
 import Iter "mo:core/Iter";
+import Map "mo:core/Map";
 import Array "mo:core/Array";
-import Principal "mo:core/Principal";
-import AccessControl "authorization/access-control";
 import Runtime "mo:core/Runtime";
+import Principal "mo:core/Principal";
 import MixinAuthorization "authorization/MixinAuthorization";
-
-
+import AccessControl "authorization/access-control";
 
 actor {
+  // ========== AUTHORIZATION INITIALIZATION ==========
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
@@ -386,5 +384,49 @@ actor {
   ) : async () {
     if (not AccessControl.isAdmin(accessControlState, caller)) { Runtime.trap("Unauthorized: Only admin can update theme") };
     themeSettings := { primaryColor; accentColor; fontChoice };
+  };
+
+  // ========== CONTACT FORM ==========
+
+  public type ContactMessage = {
+    id : Nat;
+    name : Text;
+    email : Text;
+    phone : Text;
+    subject : Text;
+    message : Text;
+    timestamp : Nat;
+  };
+
+  let contactMessages = Map.empty<Nat, ContactMessage>();
+  var nextContactMessageId = 1;
+
+  public shared ({ caller }) func submitContactMessage(
+    name : Text,
+    email : Text,
+    phone : Text,
+    subject : Text,
+    message : Text,
+    timestamp : Nat,
+  ) : async () {
+    let contactMessage : ContactMessage = {
+      id = nextContactMessageId;
+      name;
+      email;
+      phone;
+      subject;
+      message;
+      timestamp;
+    };
+
+    contactMessages.add(nextContactMessageId, contactMessage);
+    nextContactMessageId += 1;
+  };
+
+  public query ({ caller }) func getContactMessages() : async [ContactMessage] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can access contact messages");
+    };
+    contactMessages.values().toArray();
   };
 };

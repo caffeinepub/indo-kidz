@@ -1,37 +1,38 @@
 {
   "kind": "build_request",
-  "title": "Display principal ID for logged-in Internet Identity user",
-  "projectName": "INDO KIDZ",
+  "title": "Set hardcoded admin principal ID in backend",
+  "projectName": "Indo Kidz",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Display the currently logged-in user's Internet Identity principal ID visibly on the page (e.g., in the Navbar or as a dismissible banner) whenever the user is authenticated, so the admin ('Akshit raj') can easily copy and share their principal ID.",
-      "target": "frontend",
+      "id": "REQ-2",
+      "text": "Set the principal ID '25vbj-lny5e-uxjij-gyv6b-tshsm-glbla-mta6g-knjdg-7lo2f-hztzh-pae' as a hardcoded or seeded admin in the backend access control system so that this principal is recognized as an admin when the application checks for admin privileges.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-recent"
+          "msg-4",
+          "msg-5"
         ],
         "quotes": [
-          "display my principal id"
+          "25vbj-lny5e-uxjij-gyv6b-tshsm-glbla-mta6g-knjdg-7lo2f-hztzh-pae",
+          "this is admin"
         ]
       },
       "acceptanceCriteria": [
-        "When a user is logged in via Internet Identity, their principal ID string is displayed on screen in a readable, copyable format.",
-        "The principal ID display is only shown when the user is authenticated (not shown to logged-out visitors).",
-        "The displayed principal ID matches the format of a valid ICP principal (e.g., xxxxx-xxxxx-xxxxx-xxxxx-xxx).",
-        "The principal ID text can be easily copied (e.g., via a copy-to-clipboard button or selectable text)."
+        "The principal '25vbj-lny5e-uxjij-gyv6b-tshsm-glbla-mta6g-knjdg-7lo2f-hztzh-pae' is recognized as an admin by the backend isAdmin or equivalent check.",
+        "Existing admin check logic and other admin principals (if any) are not broken by this change.",
+        "No other backend functionality is altered."
       ]
     }
   ],
   "constraints": [
-    "Do not modify any files under frontend/src/hooks/ (immutable paths).",
-    "Use the identity/principal already exposed by the existing useInternetIdentity hook — do not introduce a new auth mechanism."
+    "Do not remove or break any existing admin principals or access control logic.",
+    "Keep all Motoko logic in backend/main.mo (single-actor architecture)."
   ],
   "nonGoals": [
-    "Setting or hardcoding the admin principal ID — that will be done in a follow-up once the principal ID is retrieved.",
-    "Persisting or storing the principal ID on the backend.",
-    "Changing any admin access control logic in this request."
+    "Adding a UI for managing admin principals.",
+    "Changing any frontend components or pages.",
+    "Modifying fee payment or other unrelated backend features."
   ],
   "imageRequirements": {
     "required": [],

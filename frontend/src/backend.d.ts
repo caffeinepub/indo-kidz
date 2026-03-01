@@ -12,6 +12,15 @@ export interface Testimonial {
     designation: string;
     feedback: string;
 }
+export interface ContactMessage {
+    id: bigint;
+    subject: string;
+    name: string;
+    email: string;
+    message: string;
+    timestamp: bigint;
+    phone: string;
+}
 export interface SchoolInfo {
     instagramLink: string;
     twitterLink: string;
@@ -92,6 +101,7 @@ export interface backendInterface {
     getAnnouncement(id: bigint): Promise<Announcement>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getContactMessages(): Promise<Array<ContactMessage>>;
     getFeeCategories(): Promise<Array<FeeCategory>>;
     getGallery(): Promise<Array<Photo>>;
     getHomeHeroSection(): Promise<HomeHeroSection>;
@@ -100,6 +110,7 @@ export interface backendInterface {
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    submitContactMessage(name: string, email: string, phone: string, subject: string, message: string, timestamp: bigint): Promise<void>;
     updateAdmissionsContent(eligibility: string, process: string, documents: string, applicationSteps: string, portalLink: string, faq: string): Promise<void>;
     updateAnnouncement(id: bigint, title: string, body: string, date: string): Promise<void>;
     updateFeeCategory(id: bigint, name: string, amount: bigint): Promise<void>;
