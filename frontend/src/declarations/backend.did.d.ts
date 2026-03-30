@@ -50,6 +50,16 @@ export interface HomeHeroSection {
   'testimonials' : Array<Testimonial>,
   'schoolName' : string,
 }
+export interface PaymentRequest {
+  'id' : bigint,
+  'categoryId' : bigint,
+  'status' : { 'pending' : null } |
+    { 'approved' : null } |
+    { 'rejected' : null },
+  'timestamp' : bigint,
+  'payer' : Principal,
+  'amount' : bigint,
+}
 export interface Photo { 'id' : bigint, 'url' : string, 'caption' : string }
 export interface SchoolHighlights {
   'highlight1' : string,
@@ -90,9 +100,11 @@ export interface _SERVICE {
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'deleteAnnouncement' : ActorMethod<[bigint], undefined>,
   'deleteFeeCategory' : ActorMethod<[bigint], undefined>,
+  'deletePaymentRequest' : ActorMethod<[bigint], undefined>,
   'deletePhoto' : ActorMethod<[bigint], undefined>,
   'getAdmissionsContent' : ActorMethod<[], AdmissionsContent>,
   'getAllAnnouncements' : ActorMethod<[], Array<Announcement>>,
+  'getAllPaymentRequests' : ActorMethod<[], Array<PaymentRequest>>,
   'getAnnouncement' : ActorMethod<[bigint], Announcement>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
@@ -100,6 +112,10 @@ export interface _SERVICE {
   'getFeeCategories' : ActorMethod<[], Array<FeeCategory>>,
   'getGallery' : ActorMethod<[], Array<Photo>>,
   'getHomeHeroSection' : ActorMethod<[], HomeHeroSection>,
+  'getPaymentRequestsByStatus' : ActorMethod<
+    [{ 'pending' : null } | { 'approved' : null } | { 'rejected' : null }],
+    Array<PaymentRequest>
+  >,
   'getSchoolInfo' : ActorMethod<[], SchoolInfo>,
   'getThemeSettings' : ActorMethod<[], ThemeSettings>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
@@ -109,6 +125,7 @@ export interface _SERVICE {
     [string, string, string, string, string, bigint],
     undefined
   >,
+  'submitPaymentRequest' : ActorMethod<[bigint, bigint], bigint>,
   'updateAdmissionsContent' : ActorMethod<
     [string, string, string, string, string, string],
     undefined
@@ -120,6 +137,15 @@ export interface _SERVICE {
   'updateFeeCategory' : ActorMethod<[bigint, string, bigint], undefined>,
   'updateHomeHeroSection' : ActorMethod<
     [string, string, string, HeroStats, SchoolHighlights, Array<Testimonial>],
+    undefined
+  >,
+  'updatePaymentRequestStatus' : ActorMethod<
+    [
+      bigint,
+      { 'pending' : null } |
+        { 'approved' : null } |
+        { 'rejected' : null },
+    ],
     undefined
   >,
   'updateSchoolInfo' : ActorMethod<

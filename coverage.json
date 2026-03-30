@@ -1,21 +1,51 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T04:15:09.123Z",
+  "generatedAt": "2026-03-01T13:20:22.365Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
-    "implemented": 0,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
+        "id": "REQ-1",
+        "summary": "In the About Indo Kidz section on the Homepage, remove the '9 years of excellence' content block entirely. Do not modify any other section or content on the page.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/Homepage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/Homepage.tsx"
+        ]
+      },
+      {
         "id": "REQ-2",
-        "summary": "Set the principal ID '25vbj-lny5e-uxjij-gyv6b-tshsm-glbla-mta6g-knjdg-7lo2f-hztzh-pae' as a hardcoded or seeded admin in the backend access control system so that this principal is recognized as an admin when the application checks for admin privileges.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
+        "summary": "In the About Indo Kidz section on the Homepage, remove the 'Smart Class Digital Learning' content block entirely. Do not modify any other section or content on the page.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/Homepage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/Homepage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Add a 'Payment Requests' tab/column inside the Admin Panel's Customize tab area so that the admin can view all submitted fee payment requests. This view should be accessible only to authenticated admin users, consistent with how the rest of the Customize tab is restricted. The existing Customize tab and all its current contents must remain fully intact and unchanged.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/admin/PaymentRequestsViewer.tsx",
+          "frontend/src/pages/AdminPanel.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/admin/PaymentRequestsViewer.tsx",
+          "frontend/src/pages/AdminPanel.tsx"
+        ]
       }
     ]
   },
@@ -23,11 +53,16 @@
     "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
+    "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
+    "frontend/src/components/admin/PaymentRequestsViewer.tsx",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/AdminPanel.tsx",
+    "frontend/src/pages/Homepage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

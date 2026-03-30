@@ -1,4 +1,64 @@
 {
   "kind": "feature_evidence_report",
-  "features": []
+  "features": [
+    {
+      "featureId": "feature-in-the-about-indo-kidz-section-on-the-homepage-remove-the-9-years-of-excellence-content-block-entirely-do-not-modify-any-other-section-or-content-on-the-page",
+      "featureTitle": "In the About Indo Kidz section on the Homepage, remove the '9 years of excellence' content block entirely. Do not modify any other section or content on the page.",
+      "files": [
+        "frontend/src/pages/Homepage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-in-the-about-indo-kidz-section-on-the-homepage-remove-the-smart-class-digital-learning-content-block-entirely-do-not-modify-any-other-section-or-content-on-the-page",
+      "featureTitle": "In the About Indo Kidz section on the Homepage, remove the 'Smart Class Digital Learning' content block entirely. Do not modify any other section or content on the page.",
+      "files": [
+        "frontend/src/pages/Homepage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-payment-requests-tab-column-inside-the-admin-panel-s-customize-tab-area-so-that-the-admin-can-view-all-submitted-fee-payment-requests-this-view-should-be-accessible-only-to-authenticated-admin-users-consistent-with-how-the-rest-of-the-customize-tab-is-restricted-the-existing-customize-tab-and-all-its-current-contents-must-remain-fully-intact-and-unchanged",
+      "featureTitle": "Add a 'Payment Requests' tab/column inside the Admin Panel's Customize tab area so that the admin can view all submitted fee payment requests. This view should be accessible only to authenticated admin users, consistent with how the rest of the Customize tab is restricted. The existing Customize tab and all its current contents must remain fully intact and unchanged.",
+      "files": [
+        "frontend/src/components/admin/PaymentRequestsViewer.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/AdminPanel.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    }
+  ]
 }

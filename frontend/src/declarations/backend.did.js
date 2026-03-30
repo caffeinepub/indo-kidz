@@ -26,6 +26,18 @@ export const Announcement = IDL.Record({
   'body' : IDL.Text,
   'date' : IDL.Text,
 });
+export const PaymentRequest = IDL.Record({
+  'id' : IDL.Nat,
+  'categoryId' : IDL.Nat,
+  'status' : IDL.Variant({
+    'pending' : IDL.Null,
+    'approved' : IDL.Null,
+    'rejected' : IDL.Null,
+  }),
+  'timestamp' : IDL.Nat,
+  'payer' : IDL.Principal,
+  'amount' : IDL.Nat,
+});
 export const UserProfile = IDL.Record({
   'contactInfo' : IDL.Text,
   'name' : IDL.Text,
@@ -98,9 +110,11 @@ export const idlService = IDL.Service({
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'deleteAnnouncement' : IDL.Func([IDL.Nat], [], []),
   'deleteFeeCategory' : IDL.Func([IDL.Nat], [], []),
+  'deletePaymentRequest' : IDL.Func([IDL.Nat], [], []),
   'deletePhoto' : IDL.Func([IDL.Nat], [], []),
   'getAdmissionsContent' : IDL.Func([], [AdmissionsContent], ['query']),
   'getAllAnnouncements' : IDL.Func([], [IDL.Vec(Announcement)], ['query']),
+  'getAllPaymentRequests' : IDL.Func([], [IDL.Vec(PaymentRequest)], ['query']),
   'getAnnouncement' : IDL.Func([IDL.Nat], [Announcement], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
@@ -108,6 +122,17 @@ export const idlService = IDL.Service({
   'getFeeCategories' : IDL.Func([], [IDL.Vec(FeeCategory)], ['query']),
   'getGallery' : IDL.Func([], [IDL.Vec(Photo)], ['query']),
   'getHomeHeroSection' : IDL.Func([], [HomeHeroSection], ['query']),
+  'getPaymentRequestsByStatus' : IDL.Func(
+      [
+        IDL.Variant({
+          'pending' : IDL.Null,
+          'approved' : IDL.Null,
+          'rejected' : IDL.Null,
+        }),
+      ],
+      [IDL.Vec(PaymentRequest)],
+      ['query'],
+    ),
   'getSchoolInfo' : IDL.Func([], [SchoolInfo], ['query']),
   'getThemeSettings' : IDL.Func([], [ThemeSettings], ['query']),
   'getUserProfile' : IDL.Func(
@@ -122,6 +147,7 @@ export const idlService = IDL.Service({
       [],
       [],
     ),
+  'submitPaymentRequest' : IDL.Func([IDL.Nat, IDL.Nat], [IDL.Nat], []),
   'updateAdmissionsContent' : IDL.Func(
       [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
       [],
@@ -141,6 +167,18 @@ export const idlService = IDL.Service({
         HeroStats,
         SchoolHighlights,
         IDL.Vec(Testimonial),
+      ],
+      [],
+      [],
+    ),
+  'updatePaymentRequestStatus' : IDL.Func(
+      [
+        IDL.Nat,
+        IDL.Variant({
+          'pending' : IDL.Null,
+          'approved' : IDL.Null,
+          'rejected' : IDL.Null,
+        }),
       ],
       [],
       [],
@@ -184,6 +222,18 @@ export const idlFactory = ({ IDL }) => {
     'title' : IDL.Text,
     'body' : IDL.Text,
     'date' : IDL.Text,
+  });
+  const PaymentRequest = IDL.Record({
+    'id' : IDL.Nat,
+    'categoryId' : IDL.Nat,
+    'status' : IDL.Variant({
+      'pending' : IDL.Null,
+      'approved' : IDL.Null,
+      'rejected' : IDL.Null,
+    }),
+    'timestamp' : IDL.Nat,
+    'payer' : IDL.Principal,
+    'amount' : IDL.Nat,
   });
   const UserProfile = IDL.Record({
     'contactInfo' : IDL.Text,
@@ -257,9 +307,15 @@ export const idlFactory = ({ IDL }) => {
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'deleteAnnouncement' : IDL.Func([IDL.Nat], [], []),
     'deleteFeeCategory' : IDL.Func([IDL.Nat], [], []),
+    'deletePaymentRequest' : IDL.Func([IDL.Nat], [], []),
     'deletePhoto' : IDL.Func([IDL.Nat], [], []),
     'getAdmissionsContent' : IDL.Func([], [AdmissionsContent], ['query']),
     'getAllAnnouncements' : IDL.Func([], [IDL.Vec(Announcement)], ['query']),
+    'getAllPaymentRequests' : IDL.Func(
+        [],
+        [IDL.Vec(PaymentRequest)],
+        ['query'],
+      ),
     'getAnnouncement' : IDL.Func([IDL.Nat], [Announcement], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
@@ -267,6 +323,17 @@ export const idlFactory = ({ IDL }) => {
     'getFeeCategories' : IDL.Func([], [IDL.Vec(FeeCategory)], ['query']),
     'getGallery' : IDL.Func([], [IDL.Vec(Photo)], ['query']),
     'getHomeHeroSection' : IDL.Func([], [HomeHeroSection], ['query']),
+    'getPaymentRequestsByStatus' : IDL.Func(
+        [
+          IDL.Variant({
+            'pending' : IDL.Null,
+            'approved' : IDL.Null,
+            'rejected' : IDL.Null,
+          }),
+        ],
+        [IDL.Vec(PaymentRequest)],
+        ['query'],
+      ),
     'getSchoolInfo' : IDL.Func([], [SchoolInfo], ['query']),
     'getThemeSettings' : IDL.Func([], [ThemeSettings], ['query']),
     'getUserProfile' : IDL.Func(
@@ -281,6 +348,7 @@ export const idlFactory = ({ IDL }) => {
         [],
         [],
       ),
+    'submitPaymentRequest' : IDL.Func([IDL.Nat, IDL.Nat], [IDL.Nat], []),
     'updateAdmissionsContent' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
         [],
@@ -300,6 +368,18 @@ export const idlFactory = ({ IDL }) => {
           HeroStats,
           SchoolHighlights,
           IDL.Vec(Testimonial),
+        ],
+        [],
+        [],
+      ),
+    'updatePaymentRequestStatus' : IDL.Func(
+        [
+          IDL.Nat,
+          IDL.Variant({
+            'pending' : IDL.Null,
+            'approved' : IDL.Null,
+            'rejected' : IDL.Null,
+          }),
         ],
         [],
         [],

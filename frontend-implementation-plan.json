@@ -1,6 +1,65 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Set hardcoded admin principal ID in backend",
-  "requirements": []
+  "title": "Remove excellence/digital learning sections from About and add Payment Requests to Customize tab",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Remove the '9 years of excellence' content block from the About Indo Kidz section on the Homepage",
+      "acceptanceCriteria": [
+        "The '9 years of excellence' text/block is no longer visible on the Homepage in the About Indo Kidz section",
+        "All other sections and content on the Homepage remain unchanged"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Homepage.tsx",
+          "operation": "modify",
+          "description": "Remove the '9 years of excellence' content block from the About Indo Kidz section. Locate the section that displays hero stats (yearsOfExcellence) and remove only that specific stat display while preserving all other content including faculty count, students enrolled, highlights, and testimonials."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Remove the 'Smart Class Digital Learning' content block from the About Indo Kidz section on the Homepage",
+      "acceptanceCriteria": [
+        "The 'Smart Class Digital Learning' text/block is no longer visible on the Homepage in the About Indo Kidz section",
+        "All other sections and content on the Homepage remain unchanged"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Homepage.tsx",
+          "operation": "modify",
+          "description": "Remove the 'Smart Class Digital Learning' content block from the About Indo Kidz section. Locate and remove only the specific highlight or content block that mentions 'Smart Class Digital Learning' while keeping all other highlights and section content intact."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Add a 'Payment Requests' view inside the Admin Panel's Customize tab area to display all submitted fee payment requests",
+      "acceptanceCriteria": [
+        "A 'Payment Requests' section/column appears within or alongside the Customize tab in the Admin Panel",
+        "The section displays submitted payment requests (student name, fee category, payment mode, submission time) fetched from the backend",
+        "The Payment Requests section is visible only to authenticated admin users — non-admin users cannot access it",
+        "The existing Customize tab content (theme customizer, color presets, font choice) remains fully functional and unchanged",
+        "Admin access control logic is not modified"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a new React Query hook useGetAllPaymentRequests that fetches payment requests from the backend using actor.getAllPaymentRequests(). Follow the existing pattern of other query hooks in this file for consistency, including proper error handling and actor dependency checks."
+        },
+        {
+          "path": "frontend/src/components/admin/PaymentRequestsViewer.tsx",
+          "operation": "create",
+          "description": "Create a new component that displays all payment requests in a table format. Fetch payment requests using the useGetAllPaymentRequests hook. Display columns for request ID, payer principal (or user name if available via getUserProfile), fee category name (resolved via getFeeCategories), amount, timestamp (formatted), and status. Include loading skeletons and empty state handling. Follow the styling patterns used in ContactMessagesManager.tsx and FeeCategoryManager.tsx for consistency."
+        },
+        {
+          "path": "frontend/src/pages/AdminPanel.tsx",
+          "operation": "modify",
+          "description": "Add a 'Payment Requests' tab to the existing Tabs structure in the AdminPanel. Import and render the PaymentRequestsViewer component when this tab is active. The new tab should appear alongside existing tabs (Home, Admissions, Fees, etc.) and maintain the same admin-only access control that already protects the entire AdminPanel page. Do not modify any existing tab content or access control logic."
+        }
+      ]
+    }
+  ]
 }

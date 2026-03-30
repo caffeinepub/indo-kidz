@@ -2,8 +2,8 @@ import { useHomeHeroSection, useGetFeeCategories, useAnnouncements } from "../ho
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import {
-  GraduationCap, Users, Award, BookOpen, Star, MapPin, ChevronRight,
-  Megaphone, Sparkles, Heart, Shield, Zap
+  GraduationCap, Users, BookOpen, Star, MapPin, ChevronRight,
+  Megaphone, Sparkles, Heart, Shield
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -116,10 +116,9 @@ export default function Homepage() {
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 mt-12 max-w-2xl">
+          {/* Stats — only Students Enrolled and Expert Faculty */}
+          <div className="grid grid-cols-2 gap-4 mt-12 max-w-md">
             <StatCard value={`${h.heroStats.studentsEnrolled}+`} label="Students Enrolled" icon={Users} />
-            <StatCard value={`${h.heroStats.yearsOfExcellence}+`} label="Years of Excellence" icon={Award} />
             <StatCard value={`${h.heroStats.facultyCount}+`} label="Expert Faculty" icon={GraduationCap} />
           </div>
         </div>
@@ -179,12 +178,11 @@ export default function Homepage() {
                 INDO KIDZ is Bilaspur's most trusted educational institution, dedicated to nurturing young minds with a perfect blend of academics, arts, sports, and values. Our state-of-the-art campus provides an inspiring environment where curiosity thrives.
               </p>
               <p className="text-muted-foreground text-lg leading-relaxed mb-6">
-                With over 9 years of excellence, we have produced hundreds of successful students who have gone on to achieve great things. Our dedicated faculty, innovative curriculum, and supportive community make INDO KIDZ the first choice for parents who want the best for their children.
+                Our dedicated faculty, innovative curriculum, and supportive community make INDO KIDZ the first choice for parents who want the best for their children.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 {[
                   { icon: BookOpen, label: "CBSE Curriculum", desc: "Nationally recognized" },
-                  { icon: Zap, label: "Smart Classes", desc: "Digital learning" },
                   { icon: Heart, label: "Holistic Growth", desc: "Mind, body & soul" },
                   { icon: Star, label: "Award Winning", desc: "State recognized" },
                 ].map((item, i) => (
@@ -207,10 +205,6 @@ export default function Homepage() {
               <div className="absolute -bottom-4 -left-4 bg-accent text-accent-foreground p-4 rounded-2xl shadow-warm">
                 <p className="font-fredoka text-2xl">250+</p>
                 <p className="text-xs font-semibold">Happy Students</p>
-              </div>
-              <div className="absolute -top-4 -right-4 bg-primary text-white p-4 rounded-2xl shadow-playful">
-                <p className="font-fredoka text-2xl">9+</p>
-                <p className="text-xs font-semibold">Years of Trust</p>
               </div>
             </div>
           </div>

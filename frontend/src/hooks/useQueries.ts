@@ -14,6 +14,7 @@ import type {
   Announcement,
   ThemeSettings,
   ContactMessage,
+  PaymentRequest,
 } from "../backend";
 
 // ========== USER PROFILE ==========
@@ -408,5 +409,18 @@ export function useSubmitContactMessage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contactMessages"] });
     },
+  });
+}
+
+// ========== PAYMENT REQUESTS ==========
+export function useGetAllPaymentRequests() {
+  const { actor, isFetching: actorFetching } = useActor();
+  return useQuery<PaymentRequest[]>({
+    queryKey: ["paymentRequests"],
+    queryFn: async () => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.getAllPaymentRequests();
+    },
+    enabled: !!actor && !actorFetching,
   });
 }

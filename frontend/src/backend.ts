@@ -89,10 +89,33 @@ export class ExternalBlob {
         return this;
     }
 }
-export interface Testimonial {
+export interface Photo {
+    id: bigint;
+    url: string;
+    caption: string;
+}
+export interface HeroStats {
+    facultyCount: bigint;
+    yearsOfExcellence: bigint;
+    studentsEnrolled: bigint;
+}
+export interface AdmissionsContent {
+    faq: string;
+    applicationSteps: string;
+    portalLink: string;
+    documents: string;
+    eligibility: string;
+    process: string;
+}
+export interface ThemeSettings {
+    primaryColor: string;
+    accentColor: string;
+    fontChoice: string;
+}
+export interface FeeCategory {
+    id: bigint;
     name: string;
-    designation: string;
-    feedback: string;
+    amount: bigint;
 }
 export interface ContactMessage {
     id: bigint;
@@ -115,11 +138,6 @@ export interface SchoolInfo {
     phoneNumber: string;
     schoolName: string;
 }
-export interface HeroStats {
-    facultyCount: bigint;
-    yearsOfExcellence: bigint;
-    studentsEnrolled: bigint;
-}
 export interface SchoolHighlights {
     highlight1: string;
     highlight2: string;
@@ -138,37 +156,32 @@ export interface Announcement {
     body: string;
     date: string;
 }
-export interface ThemeSettings {
-    primaryColor: string;
-    accentColor: string;
-    fontChoice: string;
-}
-export interface AdmissionsContent {
-    faq: string;
-    applicationSteps: string;
-    portalLink: string;
-    documents: string;
-    eligibility: string;
-    process: string;
-}
-export interface FeeCategory {
+export interface PaymentRequest {
     id: bigint;
-    name: string;
+    categoryId: bigint;
+    status: Variant_pending_approved_rejected;
+    timestamp: bigint;
+    payer: Principal;
     amount: bigint;
 }
 export interface UserProfile {
     contactInfo: string;
     name: string;
 }
-export interface Photo {
-    id: bigint;
-    url: string;
-    caption: string;
+export interface Testimonial {
+    name: string;
+    designation: string;
+    feedback: string;
 }
 export enum UserRole {
     admin = "admin",
     user = "user",
     guest = "guest"
+}
+export enum Variant_pending_approved_rejected {
+    pending = "pending",
+    approved = "approved",
+    rejected = "rejected"
 }
 export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
@@ -178,9 +191,11 @@ export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     deleteAnnouncement(id: bigint): Promise<void>;
     deleteFeeCategory(id: bigint): Promise<void>;
+    deletePaymentRequest(id: bigint): Promise<void>;
     deletePhoto(id: bigint): Promise<void>;
     getAdmissionsContent(): Promise<AdmissionsContent>;
     getAllAnnouncements(): Promise<Array<Announcement>>;
+    getAllPaymentRequests(): Promise<Array<PaymentRequest>>;
     getAnnouncement(id: bigint): Promise<Announcement>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
@@ -188,20 +203,23 @@ export interface backendInterface {
     getFeeCategories(): Promise<Array<FeeCategory>>;
     getGallery(): Promise<Array<Photo>>;
     getHomeHeroSection(): Promise<HomeHeroSection>;
+    getPaymentRequestsByStatus(status: Variant_pending_approved_rejected): Promise<Array<PaymentRequest>>;
     getSchoolInfo(): Promise<SchoolInfo>;
     getThemeSettings(): Promise<ThemeSettings>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     submitContactMessage(name: string, email: string, phone: string, subject: string, message: string, timestamp: bigint): Promise<void>;
+    submitPaymentRequest(categoryId: bigint, amount: bigint): Promise<bigint>;
     updateAdmissionsContent(eligibility: string, process: string, documents: string, applicationSteps: string, portalLink: string, faq: string): Promise<void>;
     updateAnnouncement(id: bigint, title: string, body: string, date: string): Promise<void>;
     updateFeeCategory(id: bigint, name: string, amount: bigint): Promise<void>;
     updateHomeHeroSection(schoolName: string, tagline: string, address: string, stats: HeroStats, highlights: SchoolHighlights, testimonials: Array<Testimonial>): Promise<void>;
+    updatePaymentRequestStatus(id: bigint, newStatus: Variant_pending_approved_rejected): Promise<void>;
     updateSchoolInfo(schoolName: string, adminContactInfo: string, phoneNumber: string, emailAddress: string, address: string, principalName: string, facebookLink: string, twitterLink: string, instagramLink: string, website: string): Promise<void>;
     updateThemeSettings(primaryColor: string, accentColor: string, fontChoice: string): Promise<void>;
 }
-import type { UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
+import type { PaymentRequest as _PaymentRequest, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
@@ -302,6 +320,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async deletePaymentRequest(arg0: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deletePaymentRequest(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deletePaymentRequest(arg0);
+            return result;
+        }
+    }
     async deletePhoto(arg0: bigint): Promise<void> {
         if (this.processError) {
             try {
@@ -344,6 +376,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getAllPaymentRequests(): Promise<Array<PaymentRequest>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllPaymentRequests();
+                return from_candid_vec_n3(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllPaymentRequests();
+            return from_candid_vec_n3(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async getAnnouncement(arg0: bigint): Promise<Announcement> {
         if (this.processError) {
             try {
@@ -362,28 +408,28 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserProfile();
-                return from_candid_opt_n3(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n7(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserProfile();
-            return from_candid_opt_n3(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n7(this._uploadFile, this._downloadFile, result);
         }
     }
     async getCallerUserRole(): Promise<UserRole> {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserRole();
-                return from_candid_UserRole_n4(this._uploadFile, this._downloadFile, result);
+                return from_candid_UserRole_n8(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserRole();
-            return from_candid_UserRole_n4(this._uploadFile, this._downloadFile, result);
+            return from_candid_UserRole_n8(this._uploadFile, this._downloadFile, result);
         }
     }
     async getContactMessages(): Promise<Array<ContactMessage>> {
@@ -442,6 +488,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getPaymentRequestsByStatus(arg0: Variant_pending_approved_rejected): Promise<Array<PaymentRequest>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getPaymentRequestsByStatus(to_candid_variant_n10(this._uploadFile, this._downloadFile, arg0));
+                return from_candid_vec_n3(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getPaymentRequestsByStatus(to_candid_variant_n10(this._uploadFile, this._downloadFile, arg0));
+            return from_candid_vec_n3(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async getSchoolInfo(): Promise<SchoolInfo> {
         if (this.processError) {
             try {
@@ -474,14 +534,14 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getUserProfile(arg0);
-                return from_candid_opt_n3(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n7(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getUserProfile(arg0);
-            return from_candid_opt_n3(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n7(this._uploadFile, this._downloadFile, result);
         }
     }
     async isCallerAdmin(): Promise<boolean> {
@@ -523,6 +583,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.submitContactMessage(arg0, arg1, arg2, arg3, arg4, arg5);
+            return result;
+        }
+    }
+    async submitPaymentRequest(arg0: bigint, arg1: bigint): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.submitPaymentRequest(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.submitPaymentRequest(arg0, arg1);
             return result;
         }
     }
@@ -582,6 +656,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async updatePaymentRequestStatus(arg0: bigint, arg1: Variant_pending_approved_rejected): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updatePaymentRequestStatus(arg0, to_candid_variant_n10(this._uploadFile, this._downloadFile, arg1));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updatePaymentRequestStatus(arg0, to_candid_variant_n10(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
     async updateSchoolInfo(arg0: string, arg1: string, arg2: string, arg3: string, arg4: string, arg5: string, arg6: string, arg7: string, arg8: string, arg9: string): Promise<void> {
         if (this.processError) {
             try {
@@ -611,13 +699,55 @@ export class Backend implements backendInterface {
         }
     }
 }
-function from_candid_UserRole_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
-    return from_candid_variant_n5(_uploadFile, _downloadFile, value);
+function from_candid_PaymentRequest_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _PaymentRequest): PaymentRequest {
+    return from_candid_record_n5(_uploadFile, _downloadFile, value);
 }
-function from_candid_opt_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
+function from_candid_UserRole_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
+    return from_candid_variant_n9(_uploadFile, _downloadFile, value);
+}
+function from_candid_opt_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: bigint;
+    categoryId: bigint;
+    status: {
+        pending: null;
+    } | {
+        approved: null;
+    } | {
+        rejected: null;
+    };
+    timestamp: bigint;
+    payer: Principal;
+    amount: bigint;
+}): {
+    id: bigint;
+    categoryId: bigint;
+    status: Variant_pending_approved_rejected;
+    timestamp: bigint;
+    payer: Principal;
+    amount: bigint;
+} {
+    return {
+        id: value.id,
+        categoryId: value.categoryId,
+        status: from_candid_variant_n6(_uploadFile, _downloadFile, value.status),
+        timestamp: value.timestamp,
+        payer: value.payer,
+        amount: value.amount
+    };
+}
+function from_candid_variant_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    pending: null;
+} | {
+    approved: null;
+} | {
+    rejected: null;
+}): Variant_pending_approved_rejected {
+    return "pending" in value ? Variant_pending_approved_rejected.pending : "approved" in value ? Variant_pending_approved_rejected.approved : "rejected" in value ? Variant_pending_approved_rejected.rejected : value;
+}
+function from_candid_variant_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     admin: null;
 } | {
     user: null;
@@ -626,8 +756,26 @@ function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uin
 }): UserRole {
     return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
 }
+function from_candid_vec_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_PaymentRequest>): Array<PaymentRequest> {
+    return value.map((x)=>from_candid_PaymentRequest_n4(_uploadFile, _downloadFile, x));
+}
 function to_candid_UserRole_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
     return to_candid_variant_n2(_uploadFile, _downloadFile, value);
+}
+function to_candid_variant_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Variant_pending_approved_rejected): {
+    pending: null;
+} | {
+    approved: null;
+} | {
+    rejected: null;
+} {
+    return value == Variant_pending_approved_rejected.pending ? {
+        pending: null
+    } : value == Variant_pending_approved_rejected.approved ? {
+        approved: null
+    } : value == Variant_pending_approved_rejected.rejected ? {
+        rejected: null
+    } : value;
 }
 function to_candid_variant_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
     admin: null;

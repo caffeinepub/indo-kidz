@@ -2,7 +2,7 @@ import { useInternetIdentity } from "../hooks/useInternetIdentity";
 import { useIsAdmin } from "../hooks/useQueries";
 import AccessDeniedScreen from "../components/AccessDeniedScreen";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Home, BookOpen, IndianRupee, Image, Phone, Megaphone, Palette, MessageSquare, Receipt } from "lucide-react";
+import { Settings, Home, BookOpen, IndianRupee, Image, Phone, Megaphone, Palette, MessageSquare, Receipt, CreditCard } from "lucide-react";
 import HomeContentEditor from "../components/admin/HomeContentEditor";
 import AdmissionsContentEditor from "../components/admin/AdmissionsContentEditor";
 import FeeCategoryManager from "../components/admin/FeeCategoryManager";
@@ -12,6 +12,7 @@ import AnnouncementsManager from "../components/admin/AnnouncementsManager";
 import ThemeCustomizer from "../components/admin/ThemeCustomizer";
 import ContactMessagesManager from "../components/admin/ContactMessagesManager";
 import FeePaymentsViewer from "../components/admin/FeePaymentsViewer";
+import PaymentRequestsViewer from "../components/admin/PaymentRequestsViewer";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AdminPanel() {
@@ -35,6 +36,7 @@ export default function AdminPanel() {
     { value: "admissions", label: "Admissions", icon: BookOpen, component: <AdmissionsContentEditor /> },
     { value: "fees", label: "Fee Structure", icon: IndianRupee, component: <FeeCategoryManager /> },
     { value: "fee-payments", label: "Fee Payments", icon: Receipt, component: <FeePaymentsViewer /> },
+    { value: "payment-requests", label: "Payment Requests", icon: CreditCard, component: <PaymentRequestsViewer /> },
     { value: "gallery", label: "Gallery", icon: Image, component: <GalleryManager /> },
     { value: "contact", label: "Contact Us", icon: Phone, component: <ContactEditor /> },
     { value: "announcements", label: "Announcements", icon: Megaphone, component: <AnnouncementsManager /> },

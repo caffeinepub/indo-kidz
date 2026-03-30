@@ -1,31 +1,61 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Project involves an admin panel with a fee payment tab and customize panel. User has provided a principal ID to be set as an admin.",
+  "summary": "IndoKidz web application with admin customization panel. Removing '9 years of excellence' and 'Smart Class Digital Learning' sections from the About IndoKidz section, and adding a Payment Requests column in the Customize tab (admin-only).",
   "architectural_notes": [
-    "Admin principal ID: 25vbj-lny5e-uxjij-gyv6b-tshsm-glbla-mta6g-knjdg-7lo2f-hztzh-pae"
+    "Customize tab is restricted to admin users only — must remain admin-only",
+    "No other UI or admin logic should be changed when implementing new requests"
   ],
   "known_issues": [],
   "isFixRequest": false,
-  "existing_features": [],
+  "existing_features": [
+    {
+      "id": "feature-in-the-about-indo-kidz-section-on-the-homepage-remove-the-9-years-of-excellence-content-block-entirely-do-not-modify-any-other-section-or-content-on-the-page",
+      "title": "In the About Indo Kidz section on the Homepage, remove the '9 years of excellence' content block entirely. Do not modify any other section or content on the page.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-the-about-indo-kidz-section-on-the-homepage-remove-the-smart-class-digital-learning-content-block-entirely-do-not-modify-any-other-section-or-content-on-the-page",
+      "title": "In the About Indo Kidz section on the Homepage, remove the 'Smart Class Digital Learning' content block entirely. Do not modify any other section or content on the page.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-payment-requests-tab-column-inside-the-admin-panel-s-customize-tab-area-so-that-the-admin-can-view-all-submitted-fee-payment-requests-this-view-should-be-accessible-only-to-authenticated-admin-users-consistent-with-how-the-rest-of-the-customize-tab-is-restricted-the-existing-customize-tab-and-all-its-current-contents-must-remain-fully-intact-and-unchanged",
+      "title": "Add a 'Payment Requests' tab/column inside the Admin Panel's Customize tab area so that the admin can view all submitted fee payment requests. This view should be accessible only to authenticated admin users, consistent with how the rest of the Customize tab is restricted. The existing Customize tab and all its current contents must remain fully intact and unchanged.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    }
+  ],
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Set provided principal ID as admin in the application",
+      "summary": "Remove '9 years of excellence' section from About IndoKidz",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Set the principal ID '25vbj-lny5e-uxjij-gyv6b-tshsm-glbla-mta6g-knjdg-7lo2f-hztzh-pae' as a hardcoded or seeded admin in the backend access control system so that this principal is recognized as an admin when the application checks for admin privileges.",
-      "reqIds": [
-        "REQ-2"
-      ],
+      "summary": "Remove 'Smart Class Digital Learning' section from About IndoKidz",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Add Payment Requests column in Customize tab, visible to admin only",
+      "reqIds": [],
       "status": "pending"
     }
   ],
   "gameProjectType": "none",
-  "projectName": "Indo Kidz",
+  "projectName": "IndoKidz",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

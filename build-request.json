@@ -1,38 +1,77 @@
 {
   "kind": "build_request",
-  "title": "Set hardcoded admin principal ID in backend",
+  "title": "Remove excellence/digital learning sections from About and add Payment Requests to Customize tab",
   "projectName": "Indo Kidz",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-2",
-      "text": "Set the principal ID '25vbj-lny5e-uxjij-gyv6b-tshsm-glbla-mta6g-knjdg-7lo2f-hztzh-pae' as a hardcoded or seeded admin in the backend access control system so that this principal is recognized as an admin when the application checks for admin privileges.",
-      "target": "backend",
+      "id": "REQ-1",
+      "text": "In the About Indo Kidz section on the Homepage, remove the '9 years of excellence' content block entirely. Do not modify any other section or content on the page.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-5"
+          "msg-latest"
         ],
         "quotes": [
-          "25vbj-lny5e-uxjij-gyv6b-tshsm-glbla-mta6g-knjdg-7lo2f-hztzh-pae",
-          "this is admin"
+          "remove the section where it is written 9 years of excellence"
         ]
       },
       "acceptanceCriteria": [
-        "The principal '25vbj-lny5e-uxjij-gyv6b-tshsm-glbla-mta6g-knjdg-7lo2f-hztzh-pae' is recognized as an admin by the backend isAdmin or equivalent check.",
-        "Existing admin check logic and other admin principals (if any) are not broken by this change.",
-        "No other backend functionality is altered."
+        "The '9 years of excellence' text/block is no longer visible on the Homepage in the About Indo Kidz section",
+        "All other sections and content on the Homepage remain unchanged"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "In the About Indo Kidz section on the Homepage, remove the 'Smart Class Digital Learning' content block entirely. Do not modify any other section or content on the page.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "remove the smart class digital learning too all this is written in about indo kidz section"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The 'Smart Class Digital Learning' text/block is no longer visible on the Homepage in the About Indo Kidz section",
+        "All other sections and content on the Homepage remain unchanged"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Add a 'Payment Requests' tab/column inside the Admin Panel's Customize tab area so that the admin can view all submitted fee payment requests. This view should be accessible only to authenticated admin users, consistent with how the rest of the Customize tab is restricted. The existing Customize tab and all its current contents must remain fully intact and unchanged.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "add a column in customize tab where the admin can see the payment request",
+          "the customize tab still should be visible to admin only",
+          "without changing admin"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A 'Payment Requests' section/column appears within or alongside the Customize tab in the Admin Panel",
+        "The section displays submitted payment requests (student name, fee category, payment mode, submission time) fetched from the backend",
+        "The Payment Requests section is visible only to authenticated admin users — non-admin users cannot access it",
+        "The existing Customize tab content (theme customizer, color presets, font choice) remains fully functional and unchanged",
+        "Admin access control logic is not modified"
       ]
     }
   ],
   "constraints": [
-    "Do not remove or break any existing admin principals or access control logic.",
-    "Keep all Motoko logic in backend/main.mo (single-actor architecture)."
+    "Do not change any admin access control logic or admin detection mechanism",
+    "Do not alter any other section of the Homepage beyond removing the two specified blocks",
+    "The Customize tab must remain admin-only as before",
+    "Do not change any other tabs or sections in the Admin Panel"
   ],
   "nonGoals": [
-    "Adding a UI for managing admin principals.",
-    "Changing any frontend components or pages.",
-    "Modifying fee payment or other unrelated backend features."
+    "Redesigning the About Indo Kidz section layout",
+    "Modifying the fee payment submission form on the public FeesPayment page",
+    "Adding payment processing or status-update functionality",
+    "Changing the admin panel's tab structure beyond adding the Payment Requests view"
   ],
   "imageRequirements": {
     "required": [],

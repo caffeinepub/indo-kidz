@@ -149,6 +149,96 @@ actor {
     feeCategories.values().toArray();
   };
 
+  // ========== FEE PAYMENT REQUESTS ==========
+  public type PaymentRequest = {
+    id : Nat;
+    categoryId : Nat;
+    amount : Nat;
+    payer : Principal;
+    status : { #pending; #approved; #rejected };
+    timestamp : Nat;
+  };
+
+  let paymentRequests = Map.empty<Nat, PaymentRequest>();
+  var nextPaymentRequestId = 1;
+
+  public shared ({ caller }) func submitPaymentRequest(categoryId : Nat, amount : Nat) : async Nat {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can submit payment requests");
+    };
+    if (amount == 0) {
+      Runtime.trap("Amount must be greater than zero");
+    };
+    // Validate category (categoryId must exist, and amount must match the category's amount)
+    let category = switch (feeCategories.get(categoryId)) {
+      case (null) { Runtime.trap("Category not found") };
+      case (?cat) { cat };
+    };
+    if (category.amount != amount) {
+      Runtime.trap("Amount does not match category");
+    };
+    let id = nextPaymentRequestId;
+    let request = {
+      id;
+      categoryId;
+      amount;
+      payer = caller;
+      status = #pending;
+      timestamp = 0;
+    };
+    paymentRequests.add(id, request);
+    nextPaymentRequestId += 1;
+    id;
+  };
+
+  public shared ({ caller }) func updatePaymentRequestStatus(id : Nat, newStatus : { #pending; #approved; #rejected }) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can modify request status");
+    };
+    switch (paymentRequests.get(id)) {
+      case (null) { Runtime.trap("Payment request not found") };
+      case (?request) {
+        let updatedRequest = {
+          id = request.id;
+          categoryId = request.categoryId;
+          amount = request.amount;
+          payer = request.payer;
+          status = newStatus;
+          timestamp = request.timestamp;
+        };
+        paymentRequests.add(id, updatedRequest);
+      };
+    };
+  };
+
+  public query ({ caller }) func getAllPaymentRequests() : async [PaymentRequest] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view all payment requests");
+    };
+    paymentRequests.values().toArray();
+  };
+
+  public query ({ caller }) func getPaymentRequestsByStatus(status : { #pending; #approved; #rejected }) : async [PaymentRequest] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view payment requests by status");
+    };
+    paymentRequests.values().toArray().filter(
+      func(request) {
+        request.status == status;
+      }
+    );
+  };
+
+  public shared ({ caller }) func deletePaymentRequest(id : Nat) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete payment requests");
+    };
+    if (not paymentRequests.containsKey(id)) {
+      Runtime.trap("Payment request not found");
+    };
+    paymentRequests.remove(id);
+  };
+
   // ========== GALLERY ==========
   public type Photo = {
     id : Nat;

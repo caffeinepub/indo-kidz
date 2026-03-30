@@ -1,9 +1,14 @@
 # Specification
 
 ## Summary
-**Goal:** Hardcode a specific principal ID as an admin in the backend access control system.
+**Goal:** Remove two content blocks from the Homepage's "About Indo Kidz" section and add a "Payment Requests" view inside the Admin Panel's Customize tab.
 
 **Planned changes:**
-- Add the principal ID `25vbj-lny5e-uxjij-gyv6b-tshsm-glbla-mta6g-knjdg-7lo2f-hztzh-pae` as a hardcoded/seeded admin in the backend `isAdmin` (or equivalent) check in `backend/main.mo`.
+- Remove the "9 years of excellence" content block from the About Indo Kidz section on the Homepage
+- Remove the "Smart Class Digital Learning" content block from the About Indo Kidz section on the Homepage
+- Add a "Payment Requests" column/section within the Customize tab in the Admin Panel, visible only to authenticated admins
+- The Payment Requests view displays submitted payment request details (student name, fee category, payment mode, submission time) fetched from the backend
+- All existing Customize tab content (theme customizer, color presets, font choice) remains unchanged
+- Admin access control logic remains unchanged
 
-**User-visible outcome:** The specified principal is recognized as an admin by the backend, granting it admin privileges without breaking any existing admin logic.
+**User-visible outcome:** The About Indo Kidz section on the Homepage no longer shows the "9 years of excellence" or "Smart Class Digital Learning" blocks. Admins can now view submitted fee payment requests directly within the Customize tab of the Admin Panel.
